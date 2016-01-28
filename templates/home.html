@@ -1,0 +1,18 @@
+<!doctype html>
+<html>
+    <body>
+    <center>
+    <a href="new_bucketlist">Add a new Bucketlist</a>
+
+    {% for bucketlist in bucketlists %}
+        <h1> {{bucketlist.name}} </h1>
+        <h5>Bucketlist created at: {{ bucketlist.date_created.strftime('%m/%d/%Y at %G:%I%p') }}</h5>
+        <h5>Bucketlist editted recently at: {{ bucketlist.date_modified.strftime('%m/%d/%Y at %G:%I%p') }}</h5>
+        <p> {{bucketlist.created_by}} </p>
+        <br>
+        <br>
+    {% endfor %}
+    </center>
+    </body>
+
+</html>
