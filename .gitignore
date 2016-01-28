@@ -45,6 +45,9 @@ coverage.xml
 *,cover
 .hypothesis/
 
+#Mac file
+.DS_Store
+
 # Translations
 *.mo
 *.pot
