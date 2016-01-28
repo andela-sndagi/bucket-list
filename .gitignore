@@ -49,6 +49,9 @@ coverage.xml
 *.mo
 *.pot
 
+#Mac file
+.DS_Store
+
 # Django stuff:
 *.log
 
