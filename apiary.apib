@@ -1,80 +1,259 @@
 FORMAT: 1A
 HOST: http://polls.apiblueprint.org/
 
-# bucket-list
+# Bucket List Service API
 
-Polls is a simple API allowing consumers to view polls and vote in them.
+BLiSA is a simple API allowing users to _CREATE bucketlists_ and _items_ in them. Then they are able to _VIEW_, _UPDATE_ and _DELETE_ them.
 
-## Questions Collection [/questions]
+## User Authentification [/auth/login/]
 
-### List All Questions [GET]
-
-+ Response 200 (application/json)
-
-        [
-            {
-                "question": "Favourite programming language?",
-                "published_at": "2015-08-05T08:40:51.620Z",
-                "choices": [
-                    {
-                        "choice": "Swift",
-                        "votes": 2048
-                    }, {
-                        "choice": "Python",
-                        "votes": 1024
-                    }, {
-                        "choice": "Objective-C",
-                        "votes": 512
-                    }, {
-                        "choice": "Ruby",
-                        "votes": 256
-                    }
-                ]
-            }
-        ]
-
-### Create a New Question [POST]
-
-You may create your own question using this action. It takes a JSON
-object containing a question and a collection of answers in the
-form of choices.
+### Logs a user in [POST]
 
 + Request (application/json)
 
         {
-            "question": "Favourite programming language?",
-            "choices": [
-                "Swift",
-                "Python",
-                "Objective-C",
-                "Ruby"
-            ]
+            "username": "us3rn@m3",
+            "password": "p@ssw0rd"
+        }
+
++ Response 200 (application/json)
+
+        {
+            "token": "t0k3n"
+        }
+
+## User Registration [/auth/register/]
+
+### Register a user [POST]
+
++ Request (application/json)
+
+        {
+            "username": "us3rn@m3",
+            "email": "email@user.com",
+            "password": "p@ssw0rd",
+            "conf_password": "p@ssw0rd"
         }
 
 + Response 201 (application/json)
 
+        {
+            "message": "Successful registration"
+        }
+
+## Bucket List Collection [/bucketlists/]
+
+### Create a New Bucket List [POST]
+
++ Request (application/json)
+
     + Headers
-
-            Location: /questions/2
-
+            
+                Authorization: JWT Token
+    
     + Body
-
+    
             {
-                "question": "Favourite programming language?",
-                "published_at": "2015-08-05T08:40:51.620Z",
-                "choices": [
-                    {
-                        "choice": "Swift",
-                        "votes": 0
-                    }, {
-                        "choice": "Python",
-                        "votes": 0
-                    }, {
-                        "choice": "Objective-C",
-                        "votes": 0
-                    }, {
-                        "choice": "Ruby",
-                        "votes": 0
-                    }
-                ]
+                "name": "BucketList1",
+                "items": [],
+                "date_created": "2015-08-12 11:57:23",
+                "date_modified": "2015-08-12 11:57:23",
+                "created_by": "1113456"
             }
+
++ Response 201 (application/json)
+
+        {
+            "id": 1,
+            "name": "BucketList1",
+            "items": [],
+            "date_created": "2015-08-12 11:57:23",
+            "date_modified": "2015-08-12 11:57:23",
+            "created_by": "1113456"
+        }
+
+
+### List All Bucket Lists [GET]
+
++ Request (application/json)
+
+    + Headers
+            
+                Authorization: JWT Token
+
++ Response 200 (application/json)
+
+        {
+            [
+                {
+                    "id": 1,
+                    "name": "BucketList1"
+                },
+                {
+                    "id": 2,
+                    "name": "BucketList2"
+                },
+                {
+                    "id": 3,
+                    "name": "BucketList3"
+                }
+            ]
+        }
+
+## Single Bucketlist [/bucketlists/<id>]
+
+### Get Single Bucket List [GET]
+
++ Request (application/json)
+
+    + Headers
+            
+                Authorization: JWT Token
+
++ Response 200 (application/json)
+
+        {
+            "id": 1,
+            "name": "BucketList1",
+            "items": [
+                {
+                    "item_id": 1,
+                    "name": "I need to do X",
+                    "date_created": "2015-08-12 11:57:23",
+                    "date_modified": "2015-08-12 11:57:23",
+                    "done": False
+                },
+                {
+                    "item_id": 2,
+                    "name": "I need to do Y",
+                    "date_created": "2015-08-12 11:59:23",
+                    "date_modified": "2015-08-12 11:59:23",
+                    "done": True
+                }
+            ],
+            "date_created": "2015-08-12 11:57:23",
+            "date_modified": "2015-08-12 11:57:23",
+            "created_by": "1113456"
+        }
+
+### Update this Bucket List [PUT]
+
++ Request (application/json)
+
+    + Headers
+                
+            Authorization: JWT Token
+        
+    + Body
+                
+            {
+                "name": "BucketList5",
+                "date_modified": "2015-08-12 11:59:23",
+            }
+
++ Response 200 (application/json)
+
+        {
+            "id": 1,
+            "name": "BucketList5",
+            "items": [
+                {
+                    "item_id": 1,
+                    "name": "I need to do X",
+                    "date_created": "2015-08-12 11:57:23",
+                    "date_modified": "2015-08-12 11:57:23",
+                    "done": False
+                },
+                {
+                    "item_id": 2,
+                    "name": "I need to do Y",
+                    "date_created": "2015-08-12 11:59:23",
+                    "date_modified": "2015-08-12 11:59:23",
+                    "done": True
+                }
+            ],
+            "date_created": "2015-08-12 11:57:23",
+            "date_modified": "2015-08-12 11:59:23",
+            "created_by": "1113456"
+        }
+
+### Delete this single Bucket List [DELETE]
+
++ Request (application/json)
+
+    + Headers
+                
+            Authorization: JWT Token
+            
++ Response 204 (application/json)
+
+## Items in a Bucketlist [/bucketlists/<id>/items/]
+
+### Create new Item in Bucket List [POST]
+
++ Request (application/json)
+
+    + Headers
+            
+            Authorization: JWT Token
+    
+    + Body
+    
+            {
+                "id": 1,
+                "name": "I need to do X",
+                "date_created": "2015-08-12 11:57:23",
+                "done": False
+            }
+
++ Response 201 (application/json)
+
+        {
+            "id": 1,
+            "item_id": 1,
+            "name": "I need to do X",
+            "date_created": "2015-08-12 11:57:23",
+            "date_modified": "2015-08-12 11:57:23",
+            "done": False
+        }
+
+## Single Item in a Bucketlist [/bucketlists/<id>/items/<item_id>]
+
+### Update this Bucket List Item [PUT]
+
++ Request (application/json)
+
+    + Headers
+            
+            Authorization: JWT Token
+    
+    + Body
+    
+            {
+                "id": 1,
+                "item_id": 1,
+                "name": "I need to do Z",
+                "date_modified": "2015-08-12 11:59:23",
+                "done": True
+            }
+
++ Response 200 (application/json)
+
+        {
+            "id": 1,
+            "item_id": 1,
+            "name": "I need to do Z",
+            "date_created": "2015-08-12 11:57:23",
+            "date_modified": "2015-08-12 11:59:23",
+            "done": True
+        }
+
+### Delete this Bucket List Item [DELETE]
+
++ Request (application/json)
+
+    + Headers
+            
+            Authorization: JWT Token
+
++ Response 204 (application/json)
