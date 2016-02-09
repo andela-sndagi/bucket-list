@@ -1,6 +1,20 @@
-# bucket-list
+# Bucket List Service API
 [![Build Status](https://semaphoreci.com/api/v1/stanmd/bucketlist/branches/master/badge.svg)](https://semaphoreci.com/stanmd/bucketlist)
 
-A bucketlist app for the things you want to do before you expire.
+BLiSA is a simple REST API allowing users to _CREATE_ bucketlists (things you want to do before you expire) and items in them. Then they are able to _VIEW_, _UPDATE_ and _DELETE_ them.
 
-Implemented in python.
+The entire documentation is in this [Apiary API Blueprint](http://docs.stanmdbucketlist.apiary.io/)
+
+You could perform tests on this repo using the API blueprint by running the following commands:
+
+- `npm install -g dredd`
+This command installs _dreed_ which will help us run the tests
+Incase of any errors, please try running this command again as root/Administrator `sudo npm install -g dredd`
+
+- `dredd init -r apiary -j apiaryApiKey:th3@p1@ryK3y -j apiaryApiName:stanmdbucketlist`
+
+- `pip install dredd_hooks`
+Run this command in the virtual environment. You could run it globally if you wish (that is if you reckon you'll use apiary's API blueprint amny times over)
+
+- `dredd apiary.apib http://localhost:5000 --language python --hookfiles=./hooks*.py`
+Run this command after running the server
