@@ -99,6 +99,10 @@ Bucket List Collection [/bucketlists/]
 """
 @app.route('/bucketlists/', methods = (['GET']))
 def get_bucketlists():
+    # bucketlist = {bucket_lists=[bucketlists={}]}
+    bucketlists = []
+    for bucketlist in Bucketlist.select():
+        bucketlists.append({'id':bucketlist.id, 'name':bucketlist.name})
 
     return jsonify({'bucketlists': bucketlists})
 
@@ -136,8 +140,11 @@ items = [
 
 @app.route('/bucketlists/<int:id>', methods = (['GET']))
 def get_single_bucketlist(id):
-    return jsonify({'items': items})
+    bucketlistitems = []
+    for bucketlistitem in BucketlistItem.select():
+        bucketlistitems.append({'id':bucketlistitem.id, 'name':bucketlistitem.name, 'done':bucketlistitem.done })
 
+    return jsonify({'items': bucketlistitems})
 @app.route('/bucketlists/<int:id>', methods = (['PUT']))
 def update_bucketlist(id):
     item = [item for item in items if item['id'] == id]
