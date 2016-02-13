@@ -20,7 +20,7 @@ def teardown_request(exception):
 """
 User Authentification [/auth/login/]
 """
-@app.route('/auth/login', methods = ['POST'])
+@app.route('/auth/login/', methods = ['POST'])
 def login():
     # Json accepted
     # {
@@ -51,7 +51,7 @@ def login():
         error = 'Invalid username/password'
         return jsonify({'error': error})
 
-@app.route('/auth/logout', methods = ['POST'])
+@app.route('/auth/logout/', methods = ['POST'])
 def logout():
     # remove the username from the session if it's there
     session.pop('username', None)
@@ -62,7 +62,7 @@ def logout():
 """
 User Registration [/auth/register/]
 """
-@app.route('/auth/register', methods=['POST'])
+@app.route('/auth/register/', methods=['POST'])
 def register():
     # Json accepted in this route
     # {
@@ -106,7 +106,8 @@ def get_bucketlists():
 def create_bucketlist():
     # The Json accepted
     # {
-    #     "name": "Freb"
+    #     "name": "Freb",
+    #     "created_by": "creator"
     # }
     if not request.json or not 'name' in request.json:
         abort(400)
@@ -125,6 +126,7 @@ Single Bucketlist [/bucketlists/<id>]
 items = [
     {
         "id": 1,
+        "bl_id": 1,
         "name": "I need to do X",
         "date_created": "2015-08-12 11:57:23",
         "date_modified": "2015-08-12 11:57:23",
@@ -161,18 +163,16 @@ def delete_bucketlist(id):
 """
 Items in a Bucketlist [/bucketlists/<id>/items/]
 """
-@app.route('/bucketlists/<int:id>/items', methods = ['GET'])
+@app.route('/bucketlists/<int:id>/items', methods = ['POST'])
 def get_blitem(id):
-    item = {
-        'id': 2,
-        "item_id": items[-1]['id'] + 1,
-        "name": "I need to do Y",
-        "date_created": "2015-08-12 11:59:23",
-        "date_modified": "2015-08-12 11:59:23",
-        "done": True
-    }
-    items.append(item)
-    return jsonify({'item': item})
+    # bl_id = self.id
+    name = request.json['name']
+    done = request.json['done']
+    created_by = request.json['created_by']
+    parameters = request.json
+    item = BucketlistItem(**parameters)
+    item.save()
+    return jsonify({'item': item.name})
 
 
 """

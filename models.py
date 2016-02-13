@@ -54,7 +54,8 @@ class BucketlistItem(Model):
     Model for BucketlistItem Table
     """
     id = PrimaryKeyField()
-    bl_id = ForeignKeyField(Bucketlist, related_name='items')
+    # bl_id = IntegerField()
+    # bl_id = ForeignKeyField(Bucketlist, related_name='items')
     name = CharField()
     date_created = DateTimeField(default = datetime.datetime.now)
     date_modified = DateTimeField(default = datetime.datetime.now)
