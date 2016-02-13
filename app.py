@@ -1,12 +1,10 @@
 from flask import Flask, jsonify, request, abort, session, escape
+import re
 from models import *
-import re, jwt
 
 
 app = Flask(__name__) # Initialise Flask
 app.secret_key = '\xfd{H\xe5<\x95\xf9\xe3\x96.5\xd1\x01O<!\xd5\xa2\xa0\x9fR"\xa1\xa8'
-
-# self.token = ""
 
 @app.before_request
 def before_request():
@@ -99,24 +97,9 @@ def register():
 """
 Bucket List Collection [/bucketlists/]
 """
-bucketlists = [
-    {
-        "id": 1,
-        "name": "BucketList1",
-    },
-    {
-        "id": 2,
-        "name": "BucketList2",
-    },
-    {
-        "id": 3,
-        "name": "BucketList3",
-    }
-]
-
 @app.route('/bucketlists/', methods = (['GET']))
 def get_bucketlists():
-    # app.secret_key =
+
     return jsonify({'bucketlists': bucketlists})
 
 @app.route('/bucketlists/', methods = (['POST']))
@@ -127,12 +110,13 @@ def create_bucketlist():
     # }
     if not request.json or not 'name' in request.json:
         abort(400)
-    bucketlist = {
-        'id': bucketlists[-1]['id'] + 1,
-        'name': request.json['name'],
-    }
-    bucketlists.append(bucketlist)
-    return jsonify({'bucketlist': bucketlist}), 201
+    name = request.json['name']
+    created_by = request.json['created_by']
+    parameters = request.json
+    bucketlist = Bucketlist(**parameters)
+    bucketlist.save()
+
+    return jsonify({'bucketlist created': bucketlist.name}), 201
 
 
 """
