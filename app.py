@@ -1,8 +1,12 @@
-from flask import Flask, jsonify, request, abort
+from flask import Flask, jsonify, request, abort, session, escape
 from models import *
+import re, jwt
 
 
 app = Flask(__name__) # Initialise Flask
+app.secret_key = '\xfd{H\xe5<\x95\xf9\xe3\x96.5\xd1\x01O<!\xd5\xa2\xa0\x9fR"\xa1\xa8'
+
+# self.token = ""
 
 @app.before_request
 def before_request():
@@ -14,23 +18,87 @@ def teardown_request(exception):
     # close the db connection
     db.close()
 
-# @app.route('/auth/login', methods = ['POST'])
-# def login():
-#     token = [
-#         {
-#             "token": "t0k3n"
-#         }
-#     ]
-#     return jsonify({'token': token})
 
-# @app.route('/auth/register', methods = ['POST'])
-# def register():
-#     return 'POST'
+"""
+User Authentification [/auth/login/]
+"""
+@app.route('/auth/login', methods = ['POST'])
+def login():
+    # Json accepted
+    # {
+    #     "username": "us3rn@m3",
+    #     "password": "p@ssw0rd"
+    # }
+    username = request.json['username']
+    password = request.json['password']
+
+    # Abort if the fields entered are not username and/or password
+    if not username and not password:
+        abort(400)
+
+    # Create session
+    session['username'] = username
+    # return 'Logged in as %s' % escape(session['username'])
+    # return app.get_secret_key()
+
+    # Get the user with that username
+    user = User.get(User.username == username)
+    # jwt.encode(user, 'secret', algorithm='HS256')
+    # error = None
+    # Confirm if the password is the same as the registered one
+    if user.valid_password(password):
+        user_token = user.log_the_user_in()
+        return jsonify({'token': user_token.encode('hex')})
+    else:
+        error = 'Invalid username/password'
+        return jsonify({'error': error})
+
+@app.route('/auth/logout', methods = ['POST'])
+def logout():
+    # remove the username from the session if it's there
+    session.pop('username', None)
+    return jsonify({'message': 'You are logged out'})
+
+
+
+"""
+User Registration [/auth/register/]
+"""
+@app.route('/auth/register', methods=['POST'])
+def register():
+    # Json accepted in this route
+    # {
+    #     "username": "us3rn@m3",
+    #     "email": "email@user.com",
+    #     "password": "p@ssw0rd",
+    #     "confirm_password": "p@ssw0rd"
+    # }
+    username = request.json['username']
+    email = request.json['email']
+    password = request.json['password']
+    confirm_password = request.json['confirm_password']
+    del request.json['confirm_password']
+    parameters = request.json
+
+    user = User(**parameters)
+    # return user.username
+    if not user.username and not user.password:
+        abort(400)
+    # Confirm password
+    if user.password != confirm_password:
+        abort(400)
+    # Validate email
+    pattern = re.compile(r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)")
+
+    if pattern.match(user.email) is None:
+        abort(400)
+    user.save()
+    return jsonify({'message': 'Successful registration'}), 201
+
 
 """
 Bucket List Collection [/bucketlists/]
 """
-
 bucketlists = [
     {
         "id": 1,
@@ -46,15 +114,17 @@ bucketlists = [
     }
 ]
 
-@app.route('/bucketlists', methods = (['GET']))
+@app.route('/bucketlists/', methods = (['GET']))
 def get_bucketlists():
+    # app.secret_key =
     return jsonify({'bucketlists': bucketlists})
 
-@app.route('/bucketlists', methods = (['POST']))
+@app.route('/bucketlists/', methods = (['POST']))
 def create_bucketlist():
-    # bucketlist = Bucketlist.create(name = request.json['name'])
-    # bucketlist.save()
-    # return jsonify({'bucketlist': bucketlist}), 201
+    # The Json accepted
+    # {
+    #     "name": "Freb"
+    # }
     if not request.json or not 'name' in request.json:
         abort(400)
     bucketlist = {
@@ -64,10 +134,10 @@ def create_bucketlist():
     bucketlists.append(bucketlist)
     return jsonify({'bucketlist': bucketlist}), 201
 
+
 """
 Single Bucketlist [/bucketlists/<id>]
 """
-
 items = [
     {
         "id": 1,
@@ -78,24 +148,19 @@ items = [
     }
 ]
 
-@app.route('/bucketlists/<id>', methods = (['GET']))
+@app.route('/bucketlists/<int:id>', methods = (['GET']))
 def get_single_bucketlist(id):
     return jsonify({'items': items})
-
 
 @app.route('/bucketlists/<int:id>', methods = (['PUT']))
 def update_bucketlist(id):
     item = [item for item in items if item['id'] == id]
-    # if len(item) == 0:
-    #     abort(404)
-    # if not request.json:
-    #     abort(400)
-    # if 'name' in request.json and type(request.json['name']) != unicode:
-    #     abort(400)
-    # if 'date_modified' in request.json and type(request.json['date_modified']) is not unicode:
-    #     abort(400)
-    # if 'done' in request.json and type(request.json['done']) is not bool:
-    #     abort(400)
+    # The Json accepted
+    # {
+    # "name": "Stan",
+    # "date_modified": "2015-08-12 11:59:23",
+    # "done": null
+    # }
     item[0]['name'] = request.json['name']
     item[0]['date_modified'] = request.json['date_modified']
     item[0]['done'] = request.json['done']
@@ -109,59 +174,46 @@ def delete_bucketlist(id):
     items.remove(item[0])
     return jsonify({'result': True})
 
-# def get_task(task_id):
-#     task = [task for task in tasks if task['id'] == task_id]
-#     if len(task) == 0:
-#         abort(404)
-#     return jsonify({'task': task[0]})
-
-# def specificbl(id):
-#     if request.method == 'GET':
-#         return jsonify({'items': items})
-#     elif request.method == 'PUT':
-#         item = [item for item in items if item['id'] == item_id]
-#         if len(item) == 0:
-#             abort(404)
-#         if not request.json:
-#             abort(400)
-#         if 'name' in request.json and type(request.json['name']) != unicode:
-#             abort(400)
-#         if 'date_modified' in request.json and type(request.json['date_modified']) is not unicode:
-#             abort(400)
-#         if 'done' in request.json and type(request.json['done']) is not bool:
-#             abort(400)
-#         item[0]['name'] = request.json.get('name', item[0]['name'])
-#         item[0]['date_modified'] = request.json.get('date_modified', task[0]['date_modified'])
-#         item[0]['done'] = request.json.get('done', item[0]['done'])
-#         return jsonify({'item': item[0]})
-#     elif request.method == 'DELETE':
-#         task = [item for item in items if item['id'] == item_id]
-#         if len(item) == 0:
-#             abort(404)
-#         items.remove(item[0])
-#         return jsonify({'result': True})
+"""
+Items in a Bucketlist [/bucketlists/<id>/items/]
+"""
+@app.route('/bucketlists/<int:id>/items', methods = ['GET'])
+def get_blitem(id):
+    item = {
+        'id': 2,
+        "item_id": items[-1]['id'] + 1,
+        "name": "I need to do Y",
+        "date_created": "2015-08-12 11:59:23",
+        "date_modified": "2015-08-12 11:59:23",
+        "done": True
+    }
+    items.append(item)
+    return jsonify({'item': item})
 
 
+"""
+Single Item in a Bucketlist [/bucketlists/<id>/items/<item_id>]
+"""
+@app.route('/bucketlists/<int:id>/items/<int:item_id>', methods = (['PUT']))
+def update_blitem(id, item_id):
+    item = [item for item in items if item['id'] == id]
+    # The Json accepted
+    # item = {
+    #     'id': 2,
+    #     "item_id": items[-1]['id'] + 1,
+    #     "name": "I need to do Y",
+    #     "date_created": "2015-08-12 11:59:23",
+    #     "date_modified": "2015-08-12 11:59:23",
+    #     "done": True
+    # }
+    item[0]['name'] = request.json['name']
+    item[0]['date_modified'] = request.json['date_modified']
+    item[0]['done'] = request.json['done']
+    return jsonify({'item': item[0]})
 
-# Single Item in a Bucketlist [/bucketlists/<id>/items/<item_id>]
-
-@app.route('/bucketlists/<id>/items/', methods = ['POST'])
-def blitems(id):
-    if not request.json or not 'title' in request.json:
-        abort(400)
-        item = {
-            "item_id": 2,
-            "name": "I need to do Y",
-            "date_created": "2015-08-12 11:59:23",
-            "date_modified": "2015-08-12 11:59:23",
-            "done": True
-        }
-        items.append(item)
-        return jsonify({'item': item}), 201
-
-# @app.route('/bucketlists/<id>/items/<item_id>', methods = (['PUT'], ['DELETE']))
-# def bliitem(id, item_id):
-#     pass
+@app.route('/bucketlists/<int:id>/items/<int:item_id>', methods = ['DELETE'])
+def delete_blitem(id, item_id):
+    pass
 
 if __name__ == '__main__':
     app.run(debug=True)
