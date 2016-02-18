@@ -1,12 +1,12 @@
-from flask import Flask, jsonify, request, abort, session, escape
+import re  # We'll need this for email pattern match
+from flask import Flask, jsonify, request, abort, make_response, url_for
+from flask.ext.httpauth import HTTPBasicAuth  # We'll need this for auth
 from models import *
-import re, jwt
 
 
-app = Flask(__name__) # Initialise Flask
-app.secret_key = '\xfd{H\xe5<\x95\xf9\xe3\x96.5\xd1\x01O<!\xd5\xa2\xa0\x9fR"\xa1\xa8'
-
-# self.token = ""
+app = Flask(__name__)  # Initialise Flask
+app.secret_key = '\xfd{H\xe5<\x95\xf9\xe3\x96.5\xd1\x01O<!\xd5\xa2 \
+    \xa0\x9fR"\xa1\xa8'
 
 @app.before_request
 def before_request():
@@ -20,51 +20,9 @@ def teardown_request(exception):
 
 
 """
-User Authentification [/auth/login/]
-"""
-@app.route('/auth/login', methods = ['POST'])
-def login():
-    # Json accepted
-    # {
-    #     "username": "us3rn@m3",
-    #     "password": "p@ssw0rd"
-    # }
-    username = request.json['username']
-    password = request.json['password']
-
-    # Abort if the fields entered are not username and/or password
-    if not username and not password:
-        abort(400)
-
-    # Create session
-    session['username'] = username
-    # return 'Logged in as %s' % escape(session['username'])
-    # return app.get_secret_key()
-
-    # Get the user with that username
-    user = User.get(User.username == username)
-    # jwt.encode(user, 'secret', algorithm='HS256')
-    # error = None
-    # Confirm if the password is the same as the registered one
-    if user.valid_password(password):
-        user_token = user.log_the_user_in()
-        return jsonify({'token': user_token.encode('hex')})
-    else:
-        error = 'Invalid username/password'
-        return jsonify({'error': error})
-
-@app.route('/auth/logout', methods = ['POST'])
-def logout():
-    # remove the username from the session if it's there
-    session.pop('username', None)
-    return jsonify({'message': 'You are logged out'})
-
-
-
-"""
 User Registration [/auth/register/]
 """
-@app.route('/auth/register', methods=['POST'])
+@app.route('/auth/register/', methods=['POST'])
 def register():
     # Json accepted in this route
     # {
@@ -97,60 +55,78 @@ def register():
 
 
 """
+User Authentification [/auth/login/]
+"""
+@app.route('/auth/login/', methods = ['POST'])
+def login():
+    # Json accepted
+    # {
+    #     "username": "us3rn@m3",
+    #     "password": "p@ssw0rd"
+    # }
+    username = request.json['username']
+    password = request.json['password']
+
+    # Abort if the fields entered are not username and/or password
+    if not username and not password:
+        abort(400)
+
+    # Get the user with that username
+    user = User.get(User.username == username)
+    if user.valid_password(password):
+        user_token = user.log_the_user_in()
+        return jsonify({'token': user_token.encode('hex')})
+    else:
+        error = 'Invalid username/password'
+        return jsonify({'error': error})
+
+
+"""
+User Authentification [/auth/logout/]
+"""
+@app.route('/auth/logout/', methods = ['POST'])
+def logout():
+    return jsonify({'message': 'You are logged out'})
+
+
+"""
 Bucket List Collection [/bucketlists/]
 """
-bucketlists = [
-    {
-        "id": 1,
-        "name": "BucketList1",
-    },
-    {
-        "id": 2,
-        "name": "BucketList2",
-    },
-    {
-        "id": 3,
-        "name": "BucketList3",
-    }
-]
-
 @app.route('/bucketlists/', methods = (['GET']))
 def get_bucketlists():
-    # app.secret_key =
+    # bucketlist = {bucket_lists=[bucketlists={}]}
+    bucketlists = []
+    for bucketlist in Bucketlist.select():
+        bucketlists.append({'id':bucketlist.id, 'name':bucketlist.name})
     return jsonify({'bucketlists': bucketlists})
 
 @app.route('/bucketlists/', methods = (['POST']))
 def create_bucketlist():
     # The Json accepted
     # {
-    #     "name": "Freb"
+    #     "name": "Freb",
+    #     "created_by": "creator"
     # }
     if not request.json or not 'name' in request.json:
         abort(400)
-    bucketlist = {
-        'id': bucketlists[-1]['id'] + 1,
-        'name': request.json['name'],
-    }
-    bucketlists.append(bucketlist)
-    return jsonify({'bucketlist': bucketlist}), 201
+    name = request.json['name']
+    created_by = request.json['created_by']
+    parameters = request.json
+    bucketlist = Bucketlist(**parameters)
+    bucketlist.save()
+
+    return jsonify({'bucketlist created': bucketlist.name}), 201
 
 
 """
 Single Bucketlist [/bucketlists/<id>]
 """
-items = [
-    {
-        "id": 1,
-        "name": "I need to do X",
-        "date_created": "2015-08-12 11:57:23",
-        "date_modified": "2015-08-12 11:57:23",
-        "done": False
-    }
-]
-
 @app.route('/bucketlists/<int:id>', methods = (['GET']))
 def get_single_bucketlist(id):
-    return jsonify({'items': items})
+    bucketlistitems = []
+    for bucketlistitem in BucketlistItem.select():
+        bucketlistitems.append({'id':bucketlistitem.id, 'name':bucketlistitem.name, 'done':bucketlistitem.done })
+    return jsonify({'items': bucketlistitems})
 
 @app.route('/bucketlists/<int:id>', methods = (['PUT']))
 def update_bucketlist(id):
@@ -177,18 +153,16 @@ def delete_bucketlist(id):
 """
 Items in a Bucketlist [/bucketlists/<id>/items/]
 """
-@app.route('/bucketlists/<int:id>/items', methods = ['GET'])
+@app.route('/bucketlists/<int:id>/items', methods = ['POST'])
 def get_blitem(id):
-    item = {
-        'id': 2,
-        "item_id": items[-1]['id'] + 1,
-        "name": "I need to do Y",
-        "date_created": "2015-08-12 11:59:23",
-        "date_modified": "2015-08-12 11:59:23",
-        "done": True
-    }
-    items.append(item)
-    return jsonify({'item': item})
+    # bl_id = self.id
+    name = request.json['name']
+    done = request.json['done']
+    created_by = request.json['created_by']
+    parameters = request.json
+    item = BucketlistItem(**parameters)
+    item.save()
+    return jsonify({'item': item.name})
 
 
 """
