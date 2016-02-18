@@ -5,51 +5,12 @@ HOST: http://polls.apiblueprint.org/
 
 BLiSA is a simple API allowing users to _CREATE bucketlists_ and _items_ in them. Then they are able to _VIEW_, _UPDATE_ and _DELETE_ them.
 
-## User Authentification [/auth/login/]
-
-### Logs a user in [POST]
-
-+ Request (application/json)
-
-        {
-            "username": "us3rn@m3",
-            "password": "p@ssw0rd"
-        }
-
-+ Response 200 (application/json)
-
-        {
-            "token": "t0k3n"
-        }
-
-## User Registration [/auth/register/]
-
-### Register a user [POST]
-
-+ Request (application/json)
-
-        {
-            "username": "us3rn@m3",
-            "email": "email@user.com",
-            "password": "p@ssw0rd",
-            "confirm_password": "p@ssw0rd"
-        }
-
-+ Response 201 (application/json)
-
-        {
-            "message": "Successful registration"
-        }
 
 ## Bucket List Collection [/bucketlists/]
 
 ### Create a New Bucket List [POST]
 
 + Request (application/json)
-
-    + Headers
-
-                Authorization: JWT Token
 
     + Body
 
@@ -75,12 +36,6 @@ BLiSA is a simple API allowing users to _CREATE bucketlists_ and _items_ in them
 
 ### List All Bucket Lists [GET]
 
-+ Request (application/json)
-
-    + Headers
-
-                Authorization: JWT Token
-
 + Response 200 (application/json)
 
         {
@@ -100,6 +55,8 @@ BLiSA is a simple API allowing users to _CREATE bucketlists_ and _items_ in them
             ]
         }
 
+
+
 ## Single Bucketlist [/bucketlists/<id>]
 
 ### Get Single Bucket List [GET]
@@ -108,7 +65,7 @@ BLiSA is a simple API allowing users to _CREATE bucketlists_ and _items_ in them
 
     + Headers
 
-                Authorization: JWT Token
+            id: 1
 
 + Response 200 (application/json)
 
@@ -142,7 +99,7 @@ BLiSA is a simple API allowing users to _CREATE bucketlists_ and _items_ in them
 
     + Headers
 
-            Authorization: JWT Token
+            id: 1
 
     + Body
 
@@ -177,25 +134,24 @@ BLiSA is a simple API allowing users to _CREATE bucketlists_ and _items_ in them
             "created_by": "1113456"
         }
 
+
 ### Delete this single Bucket List [DELETE]
 
 + Request (application/json)
 
     + Headers
 
-            Authorization: JWT Token
+            id: specific id
 
 + Response 204 (application/json)
+
+
 
 ## Items in a Bucketlist [/bucketlists/<id>/items/]
 
 ### Create new Item in Bucket List [POST]
 
 + Request (application/json)
-
-    + Headers
-
-            Authorization: JWT Token
 
     + Body
 
@@ -218,7 +174,10 @@ BLiSA is a simple API allowing users to _CREATE bucketlists_ and _items_ in them
             "done": False
         }
 
+
+
 ## Single Item in a Bucketlist [/bucketlists/<id>/items/<item_id>]
+
 
 ### Update this Bucket List Item [PUT]
 
@@ -226,7 +185,7 @@ BLiSA is a simple API allowing users to _CREATE bucketlists_ and _items_ in them
 
     + Headers
 
-            Authorization: JWT Token
+            id: 1
 
     + Body
 
@@ -249,12 +208,13 @@ BLiSA is a simple API allowing users to _CREATE bucketlists_ and _items_ in them
             "done": True
         }
 
+
 ### Delete this Bucket List Item [DELETE]
 
 + Request (application/json)
 
     + Headers
 
-            Authorization: JWT Token
+            id: specific id
 
 + Response 204 (application/json)

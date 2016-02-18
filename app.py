@@ -5,8 +5,6 @@ from models import *
 
 
 app = Flask(__name__)  # Initialise Flask
-app.secret_key = '\xfd{H\xe5<\x95\xf9\xe3\x96.5\xd1\x01O<!\xd5\xa2 \
-    \xa0\x9fR"\xa1\xa8'
 
 @app.before_request
 def before_request():
@@ -17,76 +15,6 @@ def before_request():
 def teardown_request(exception):
     # close the db connection
     db.close()
-
-
-"""
-User Registration [/auth/register/]
-"""
-@app.route('/auth/register/', methods=['POST'])
-def register():
-    # Json accepted in this route
-    # {
-    #     "username": "us3rn@m3",
-    #     "email": "email@user.com",
-    #     "password": "p@ssw0rd",
-    #     "confirm_password": "p@ssw0rd"
-    # }
-    username = request.json['username']
-    email = request.json['email']
-    password = request.json['password']
-    confirm_password = request.json['confirm_password']
-    del request.json['confirm_password']
-    parameters = request.json
-
-    user = User(**parameters)
-    # return user.username
-    if not user.username and not user.password:
-        abort(400)
-    # Confirm password
-    if user.password != confirm_password:
-        abort(400)
-    # Validate email
-    pattern = re.compile(r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)")
-
-    if pattern.match(user.email) is None:
-        abort(400)
-    user.save()
-    return jsonify({'message': 'Successful registration'}), 201
-
-
-"""
-User Authentification [/auth/login/]
-"""
-@app.route('/auth/login/', methods = ['POST'])
-def login():
-    # Json accepted
-    # {
-    #     "username": "us3rn@m3",
-    #     "password": "p@ssw0rd"
-    # }
-    username = request.json['username']
-    password = request.json['password']
-
-    # Abort if the fields entered are not username and/or password
-    if not username and not password:
-        abort(400)
-
-    # Get the user with that username
-    user = User.get(User.username == username)
-    if user.valid_password(password):
-        user_token = user.log_the_user_in()
-        return jsonify({'token': user_token.encode('hex')})
-    else:
-        error = 'Invalid username/password'
-        return jsonify({'error': error})
-
-
-"""
-User Authentification [/auth/logout/]
-"""
-@app.route('/auth/logout/', methods = ['POST'])
-def logout():
-    return jsonify({'message': 'You are logged out'})
 
 
 """

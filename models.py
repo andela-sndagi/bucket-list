@@ -1,38 +1,8 @@
 from peewee import * # ORM
 import datetime, os
-from passlib.hash import sha256_crypt
+
 
 db = SqliteDatabase('bucketlist.db')
-
-class User(Model):
-    """
-    Model for User Table
-    """
-    id = PrimaryKeyField()
-    username = CharField(unique=True)
-    email = CharField(unique=True)
-    password = CharField()
-
-    def set_password(self):
-        return sha256_crypt.encrypt(self.password)
-
-    # Override save method for this model
-    # The password is now saved as hashed in the DB
-    def save(self):
-        self.password = self.set_password()
-        super(User, self).save()
-
-    # Boolean statement
-    def valid_password(self, entered_password):
-        password = self.set_password()
-        return sha256_crypt.verify(entered_password, self.password)
-
-    # Is dependent on the valid_login function
-    def log_the_user_in(self):
-        return str(os.urandom(12).encode('hex'))
-
-    class Meta:
-        database = db
 
 
 class Bucketlist(Model):
@@ -67,4 +37,4 @@ class BucketlistItem(Model):
 
 def initialize_db():
     db.connect()
-    db.create_tables([User, Bucketlist, BucketlistItem], safe=True)
+    db.create_tables([Bucketlist, BucketlistItem], safe=True)
