@@ -1,10 +1,12 @@
-from flask import Flask, jsonify, request, abort, session, escape
-import re
+import re  # We'll need this for email pattern match
+from flask import Flask, jsonify, request, abort, make_response, url_for
+from flask.ext.httpauth import HTTPBasicAuth  # We'll need this for auth
 from models import *
 
 
-app = Flask(__name__) # Initialise Flask
-app.secret_key = '\xfd{H\xe5<\x95\xf9\xe3\x96.5\xd1\x01O<!\xd5\xa2\xa0\x9fR"\xa1\xa8'
+app = Flask(__name__)  # Initialise Flask
+app.secret_key = '\xfd{H\xe5<\x95\xf9\xe3\x96.5\xd1\x01O<!\xd5\xa2 \
+    \xa0\x9fR"\xa1\xa8'
 
 @app.before_request
 def before_request():
@@ -15,48 +17,6 @@ def before_request():
 def teardown_request(exception):
     # close the db connection
     db.close()
-
-
-"""
-User Authentification [/auth/login/]
-"""
-@app.route('/auth/login/', methods = ['POST'])
-def login():
-    # Json accepted
-    # {
-    #     "username": "us3rn@m3",
-    #     "password": "p@ssw0rd"
-    # }
-    username = request.json['username']
-    password = request.json['password']
-
-    # Abort if the fields entered are not username and/or password
-    if not username and not password:
-        abort(400)
-
-    # Create session
-    session['username'] = username
-    # return 'Logged in as %s' % escape(session['username'])
-    # return app.get_secret_key()
-
-    # Get the user with that username
-    user = User.get(User.username == username)
-    # jwt.encode(user, 'secret', algorithm='HS256')
-    # error = None
-    # Confirm if the password is the same as the registered one
-    if user.valid_password(password):
-        user_token = user.log_the_user_in()
-        return jsonify({'token': user_token.encode('hex')})
-    else:
-        error = 'Invalid username/password'
-        return jsonify({'error': error})
-
-@app.route('/auth/logout/', methods = ['POST'])
-def logout():
-    # remove the username from the session if it's there
-    session.pop('username', None)
-    return jsonify({'message': 'You are logged out'})
-
 
 
 """
@@ -95,6 +55,41 @@ def register():
 
 
 """
+User Authentification [/auth/login/]
+"""
+@app.route('/auth/login/', methods = ['POST'])
+def login():
+    # Json accepted
+    # {
+    #     "username": "us3rn@m3",
+    #     "password": "p@ssw0rd"
+    # }
+    username = request.json['username']
+    password = request.json['password']
+
+    # Abort if the fields entered are not username and/or password
+    if not username and not password:
+        abort(400)
+
+    # Get the user with that username
+    user = User.get(User.username == username)
+    if user.valid_password(password):
+        user_token = user.log_the_user_in()
+        return jsonify({'token': user_token.encode('hex')})
+    else:
+        error = 'Invalid username/password'
+        return jsonify({'error': error})
+
+
+"""
+User Authentification [/auth/logout/]
+"""
+@app.route('/auth/logout/', methods = ['POST'])
+def logout():
+    return jsonify({'message': 'You are logged out'})
+
+
+"""
 Bucket List Collection [/bucketlists/]
 """
 @app.route('/bucketlists/', methods = (['GET']))
@@ -103,7 +98,6 @@ def get_bucketlists():
     bucketlists = []
     for bucketlist in Bucketlist.select():
         bucketlists.append({'id':bucketlist.id, 'name':bucketlist.name})
-
     return jsonify({'bucketlists': bucketlists})
 
 @app.route('/bucketlists/', methods = (['POST']))
@@ -127,24 +121,13 @@ def create_bucketlist():
 """
 Single Bucketlist [/bucketlists/<id>]
 """
-items = [
-    {
-        "id": 1,
-        "bl_id": 1,
-        "name": "I need to do X",
-        "date_created": "2015-08-12 11:57:23",
-        "date_modified": "2015-08-12 11:57:23",
-        "done": False
-    }
-]
-
 @app.route('/bucketlists/<int:id>', methods = (['GET']))
 def get_single_bucketlist(id):
     bucketlistitems = []
     for bucketlistitem in BucketlistItem.select():
         bucketlistitems.append({'id':bucketlistitem.id, 'name':bucketlistitem.name, 'done':bucketlistitem.done })
-
     return jsonify({'items': bucketlistitems})
+
 @app.route('/bucketlists/<int:id>', methods = (['PUT']))
 def update_bucketlist(id):
     item = [item for item in items if item['id'] == id]
