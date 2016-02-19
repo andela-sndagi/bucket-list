@@ -16,3 +16,7 @@ This is how the API should look like
     date_modified: “2015-08-12 11:57:23”
     created_by: “1113456”
 }
+
+Test DB creation
+Test Tables creation
+Test relationship between tables

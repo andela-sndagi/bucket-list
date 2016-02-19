@@ -1,40 +1,40 @@
 from peewee import * # ORM
 import datetime, os
 
-
+# Database object you wish to use
 db = SqliteDatabase('bucketlist.db')
 
-
-class Bucketlist(Model):
+class BaseModel(Model):
     """
-    Model for Bucketlist Table
+    Parent model including pointing at the database
     """
-    id = PrimaryKeyField()
-    name = CharField()
-    date_created = DateTimeField(default = datetime.datetime.now)
-    date_modified = DateTimeField(default = datetime.datetime.now)
-    created_by = CharField()
-
     class Meta:
         database = db
 
 
-class BucketlistItem(Model):
+class Bucketlist(BaseModel):
+    """
+    Model for Bucketlist Table extending BaseModel
+    """
+    id = PrimaryKeyField()
+    name = CharField(unique=True)
+    date_created = DateTimeField(default = datetime.datetime.now)
+    date_modified = DateTimeField(default = datetime.datetime.now)
+    created_by = CharField()
+
+
+class BucketlistItem(BaseModel):
     """
     Model for BucketlistItem Table
     """
     id = PrimaryKeyField()
-    # bl_id = IntegerField()
-    # bl_id = ForeignKeyField(Bucketlist, related_name='items')
+    bucketlist = ForeignKeyField(Bucketlist, related_name='items')
     name = CharField()
     date_created = DateTimeField(default = datetime.datetime.now)
     date_modified = DateTimeField(default = datetime.datetime.now)
     done = BooleanField()
 
-    class Meta:
-        database = db
-
 
 def initialize_db():
     db.connect()
-    db.create_tables([Bucketlist, BucketlistItem], safe=True)
+    db.create_tables([Bucketlist, BucketlistItem], True)
