@@ -1,6 +1,6 @@
 # Bucket List Service API
 
-[![Build Status](https://semaphoreci.com/api/v1/stanmd/bucketlist/branches/feature-create-api/badge.svg)](https://semaphoreci.com/stanmd/bucketlist) [![Coverage Status](https://coveralls.io/repos/github/NdagiStanley/bucketlist/badge.svg?branch=feature-create-API)](https://coveralls.io/github/NdagiStanley/bucketlist?branch=feature-create-API) [![Code Issues](https://www.quantifiedcode.com/api/v1/project/413c57d2358940f097221a243f88d224/badge.svg)](https://www.quantifiedcode.com/app/project/413c57d2358940f097221a243f88d224)
+[![Build Status](https://semaphoreci.com/api/v1/stanmd/bucketlist/branches/feature-create-api/badge.svg)](https://semaphoreci.com/stanmd/bucketlist) [![Coverage Status](https://coveralls.io/repos/github/NdagiStanley/bucketlist/badge.svg?branch=feature-create-API)](https://coveralls.io/github/NdagiStanley/bucketlist?branch=feature-create-API) [![Code Issues](https://www.quantifiedcode.com/api/v1/project/413c57d2358940f097221a243f88d224/badge.svg)](https://www.quantifiedcode.com/app/project/413c57d2358940f097221a243f88d224) [![Code Climate](https://codeclimate.com/repos/56ceebeb477c416148009caa/badges/28e40e636cc883cc20c5/gpa.svg)](https://codeclimate.com/repos/56ceebeb477c416148009caa/feed) [![Issue Count](https://codeclimate.com/repos/56ceebeb477c416148009caa/badges/28e40e636cc883cc20c5/issue_count.svg)](https://codeclimate.com/repos/56ceebeb477c416148009caa/feed)
 
 BLiSA is a simple REST API allowing users to _**C**REATE_ bucketlists (things you want to do before you expire) and items in them. Then they are able to _**R**EAD_, _**U**PDATE_ and _**D**ELETE_ them.
 In short you are able to **CRUD** bucketlists
@@ -26,9 +26,9 @@ RUN `python run.py`
 
 RUN `nosetests`
 RUN `coverage run tests.py`
-RUN `coverage report`
 
+RUN `nosetests --with-coverage` for both tests and coverage
 
 ---
-Copyright (c) 2016
+Copyright AD-2016
 ###### [Stanley Ndagi](http://techkenyans.org/jamii/stanmd) c/o [Andela](http://andela.com)
