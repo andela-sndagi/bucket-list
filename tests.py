@@ -6,6 +6,7 @@ class AppTestCase(unittest.TestCase):
     """docstring for AppTestCase"""
     def setUp(self):
         """Setting up the environment for testing"""
+        print ('=> Setting up the environment for testing')
         app.app.config['TESTING'] = True
         self.app = app.app.test_client()
 
