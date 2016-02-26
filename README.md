@@ -12,6 +12,7 @@ It's implementing:
 
 ##Installation
 **We'll use the terminal here**
+
 1. Clone the repo
 run: ```git clone https://github.com/NdagiStanley/bucketlist.git```
 
@@ -20,14 +21,17 @@ run: ```git clone https://github.com/NdagiStanley/bucketlist.git```
 RUN ```pip install -r requirements.txt```
 
 ##Running
-RUN `python run.py`
+RUN `python run.py` and go the index page at [http://localhost:5000/](http://localhost:5000/)
+
 
 ##Testing
 
 RUN `nosetests`
+
 RUN `coverage run tests.py`
 
-RUN `nosetests --with-coverage` for both tests and coverage
+For both tests and coverage
+RUN `nosetests --with-coverage`
 
 ---
 Copyright AD-2016

@@ -20,5 +20,6 @@ class AppTestCase(unittest.TestCase):
         assert "200 OK" == resp.status
         assert "Bucket List Service API is ready" in resp.data
 
+
 if __name__ == '__main__':
     unittest.main()
