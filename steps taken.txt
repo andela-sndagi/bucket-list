@@ -14,4 +14,5 @@ Create models
 Choose ORM
 Link db
 create tables from models
-
+DB environment for Testing
+test connection and table creation

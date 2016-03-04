@@ -1,8 +1,17 @@
-from peewee import *  # ORM
+# ORM
+from peewee import SqliteDatabase, PrimaryKeyField, CharField, DateTimeField, ForeignKeyField, Model, BooleanField
+from flask import g
 import datetime, os
 
-# Database object you wish to use
-db = SqliteDatabase('bucketlist.db')
+db = SqliteDatabase('bucketlist_app.db')
+
+
+def initialize_db():
+    # g.db = SqliteDatabase(database)
+    # # using g object to 'globalize' the db
+    db.connect()
+
+
 
 class BaseModel(Model):
     """
@@ -35,6 +44,6 @@ class BucketlistItem(BaseModel):
     done = BooleanField()
 
 
-def initialize_db():
-    db.connect()
+# To be executed after
+def create_tables():
     db.create_tables([Bucketlist, BucketlistItem], True)
