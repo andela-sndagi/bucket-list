@@ -2,6 +2,6 @@ from flask_restful import Resource
 
 class Bucketlists(Resource):
     def get(self):
-        pass
+        return {'where': 'Bucketlists'}
     def post(self):
         pass
