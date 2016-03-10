@@ -14,5 +14,8 @@ Create models
 Choose ORM
 Link db
 create tables from models
+get API endpoints
+/bucketlists/ and /bucketlists/<>/items/
 DB environment for Testing
-test connection and table creation
+Test environment - test connection and table creation
+test the above endpoints

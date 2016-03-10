@@ -1,19 +1,20 @@
 class Config(object):
+    """Default Settings"""
     DEBUG = False
     TESTING = False
-    DATABASE_URI = 'sqlite://:memory:'
 
 
 class DevelopmentConfig(Config):
+    """setting Testing configuration"""
     DEBUG = True
-    DATABASE_URI = 'bucketlist_app.db'
-
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///bucketlist.db'
 
 class TestingConfig(Config):
+    """setting Testing configuration"""
     TESTING = True
+    SQLALCHEMY_DATABASE_URI = 'sqlite://'
 
-
-config = {
+CONFIG = {
     "development": DevelopmentConfig,
     "testing": TestingConfig,
     "default": DevelopmentConfig
