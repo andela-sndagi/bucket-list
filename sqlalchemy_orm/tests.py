@@ -29,17 +29,18 @@ class AppTestCase(unittest.TestCase, FixturesMixin):
     def setUp(self):
         """Setting up the environment for testing"""
         print "=> Setting up the environment for testing"
+        self.app = app.test_client()
 
     def tearDown(self):
         """Tearing down after tests"""
         print "=> Tearing down after tests"
 
-    # def test_api_index(self):
-    #     """Test if the index page is working"""
-    #     response = self.app.get('/')
-    #     print '=> Getting to "/"'
-    #     assert response.status == "200 OK"
-    #     self.assertIn('Bucket List Service API is ready', response.data)
+    def test_api_index(self):
+        """Test if the index page is working"""
+        response = self.app.get('/')
+        print '=> Getting to "/"'
+        assert response.status == "200 OK"
+        self.assertIn('Bucket List Service API is ready', response.data)
 
     def test_bucketlists(self):
         bucketlists = Bucketlist.query.all()
