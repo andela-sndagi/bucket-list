@@ -19,3 +19,5 @@ get API endpoints
 DB environment for Testing
 Test environment - test connection and table creation
 test the above endpoints
+
+> Change over to SQLAlchemy

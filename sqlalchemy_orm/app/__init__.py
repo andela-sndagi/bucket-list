@@ -8,13 +8,6 @@
 # python_version :2.7.10
 # ==============================================================================
 
-import os, sys
-import inspect
-currentdir = os.path.dirname(os.path.abspath(
-    inspect.getfile(inspect.currentframe())))
-parentdir = os.path.dirname(currentdir)
-sys.path.insert(0, parentdir)
-
 from flask import Flask
 from flask.ext.script import Manager
 from flask_restful import Api
