@@ -54,7 +54,6 @@ coverage.xml
 
 #Mac file
 .DS_Store
-previous\ code/
 
 # Django stuff:
 *.log
