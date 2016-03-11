@@ -1,28 +1,37 @@
-# !/usr/bin/python
-# title          :Main app file
-# description    :REST API allowing CRUD of bucketlists and bucketlists items
-# author         :Stanley Ndagi
-# email          :stanley.ndagi@andela.com
-# date           :20160310
-# version        :0.0.2
-# python_version :2.7.10
-# ==============================================================================
+# sqlalchemy_orm/app
+
+import os, sys
+import inspect
+currentdir = os.path.dirname(os.path.abspath(
+    inspect.getfile(inspect.currentframe())))
+parentdir = os.path.dirname(currentdir)
+sys.path.insert(0, parentdir)
+
 
 from flask import Flask
-from flask.ext.script import Manager
-from flask_restful import Api
+# from flask.ext.script import Manager
+# from flask_restful import Api
+
+
 
 # Resources
-from resources import Index
+# from resources import Index
+# from resources.bucketlists import Bucketlists
+# from resources.bucketlist_items import BucketlistItems
+
 
 # Initialise Flask
 app = Flask(__name__)
+# app.config.update(
+#     DATABASE_URI='sqlite://')
 
 # Setup manager to allow runserver, shell and migrate at runtime
-manager = Manager(app)
+# manager = Manager(app)
 
-# Instance of Api
-api = Api(app)
+# # Instance of Api
+# api = Api(app)
 
-# Urls
-api.add_resource(Index, '/')
+# # URLs
+# api.add_resource(Index, '/')
+# api.add_resource(Bucketlists, '/bucketlists/')
+# api.add_resource(BucketlistItems, '/bucketlists/<int:list_id>/items/')

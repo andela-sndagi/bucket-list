@@ -1,0 +1,23 @@
+[
+    {
+        "model": "sqlalchemy_orm.models.Bucketlist",
+        "records": [{
+            "id": 1,
+            "name": "BucketList1",
+            "date_created": "2015-08-12 11:57:23",
+            "date_modified": "2015-08-12 11:57:23",
+            "created_by": "1113456"
+        }]
+    },
+    {
+        "model": "sqlalchemy_orm.models.BucketlistItem",
+        "records": [{
+            "id": 1,
+            "title": "I need to do X",
+            "bucketlist": 1,
+            "date_created": "2015-08-12 11:57:23",
+            "date_modified": "2015-08-12 11:57:23",
+            "done": false
+        }]
+    }
+]
