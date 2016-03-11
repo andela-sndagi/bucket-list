@@ -1,17 +1,8 @@
 import unittest
 from flask_environments import Environments
-from playhouse.test_utils import test_database
 from app import app
-from app.models import db, Bucketlist, BucketlistItem
+from app.models import db, initialize_db
 from config import CONFIG
-
-# test_db = SqliteDatabase(':memory:')
-
-from flask.ext.fixtures import FixturesMixin
-
-# Configure the app with the testing configuration
-env = Environments(app)
-env.from_object(CONFIG['testing'])
 
 
 class AppTestCase(unittest.TestCase):
@@ -20,25 +11,23 @@ class AppTestCase(unittest.TestCase):
     def setUp(self):
         """Setting up the environment for testing"""
         print "=> Setting up the environment for testing"
-        for i in range(5):
-            models.Bucketlist.create(name='bucketlist-%d' % i, created_by='3123%d' % i)
-        for j in range(10):
-            models.BucketlistItem.create(name='bucketlistitem-%d' % j,
-                                         bucketlist= % i)
+        # Configure the app with the testing configuration
+        self.app = app.test_client()
+        env = Environments(app)
+        env.from_object(CONFIG['testing'])
+        initialize_db()
+        db.connect()
+
 
     def tearDown(self):
         """Tearing down after tests"""
         print "=> Tearing down after tests"
-        models.db.close()
+        db.close()
 
-    def test_fixtures(self):
-        bucketlists = Bucketlist.select()
-        import ipdb; ipdb.set_trace()
-        self.assertEqual(len(bucketlists), 1)
-        self.assertEqual(len(bucketlists[0].items), 1)
 
     def test_api_index(self):
         """Test if the index page is working"""
+
         response = self.app.get('/')
         print '=> Getting to "/"'
         assert response.status == "200 OK"
@@ -48,6 +37,13 @@ class AppTestCase(unittest.TestCase):
         """Test if the /bucketlists/ endpoint"""
         response = self.app.get('/bucketlists/')
         print '=> Getting to "/bucketlists/"'
+        assert response.status == "200 OK"
+        # self.assertEqual([], response.data)
+
+    def test_get_bucketlists_items(self):
+        """Test if the /bucketlists/ endpoint"""
+        response = self.app.get('/bucketlists/1/items/')
+        print '=> Getting to "/bucketlists/<>/items/"'
         assert response.status == "200 OK"
         # self.assertEqual([], response.data)
 
