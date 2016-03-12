@@ -21,7 +21,7 @@ run: ```git clone https://github.com/NdagiStanley/bucketlist.git```
 RUN ```pip install -r requirements.txt```
 
 ##Running
-First we create the db and tables to be used `python run.py create_db` then
+First we create the db and tables to be used `python api.py start` then
 RUN `python run.py runserver` and go the index page at [http://localhost:5000/](http://localhost:5000/)
 
 

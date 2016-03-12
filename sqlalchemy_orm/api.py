@@ -1,7 +1,7 @@
+# sqlalchemy_orm/api.py
+
 import app
 
-# configure to development
-app.app.config.update(
-    DEBUG=True, DATABASE_URI='sqlite://bucketlists.db')
+app.app.config.from_object('sqlalchemy_orm.config.DevelopmentConfig')
 
 app.manager.run()

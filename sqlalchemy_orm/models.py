@@ -1,4 +1,5 @@
 # sqlalchemy_orm/models.py
+
 import os, sys
 import inspect
 currentdir = os.path.dirname(os.path.abspath(
@@ -6,22 +7,34 @@ currentdir = os.path.dirname(os.path.abspath(
 parentdir = os.path.dirname(currentdir)
 sys.path.insert(0, parentdir)
 
-from flask.ext.sqlalchemy import SQLAlchemy
+from flask import Flask
+from flask_sqlalchemy import SQLAlchemy
 
-from sqlalchemy_orm.app import app
 
+# Initialise Flask
+app = Flask(__name__)
+
+# Database instance
 db = SQLAlchemy(app)
 
 
 class Bucketlist(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(20))
+    name = db.Column(db.String(20), unique=True)
     date_created = db.Column(db.DateTime,
                              default=db.func.current_timestamp())
     date_modified = db.Column(db.DateTime,
                               default=db.func.current_timestamp(),
                               onupdate=db.func.current_timestamp())
-    created_by = db.Column(db.String(20), unique=True)
+    created_by = db.Column(db.String(20))
+
+    #  Constructor for Bucketlist
+    def __init__(self, name, created_by):
+        self.name = name
+        self.created_by = created_by
+
+    def __repr__(self):
+        return '<Bucketlist %r>' % self.name
 
 
 class BucketlistItem(db.Model):
@@ -35,3 +48,18 @@ class BucketlistItem(db.Model):
                               default=db.func.current_timestamp(),
                               onupdate=db.func.current_timestamp())
     done = db.Column(db.Boolean, default=False)
+
+    #  Constructor for BucketlistItem
+    def __init__(self, title, bucketlist):
+        self.title = title
+        self.bucketlist = bucketlist
+
+    def __repr__(self):
+        return '<Item %r>' % self.title
+
+
+def initialise():
+    db.create_all()
+
+def drop():
+    db.drop_all()
