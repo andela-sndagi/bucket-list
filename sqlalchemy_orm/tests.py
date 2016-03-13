@@ -14,7 +14,7 @@ from flask.ext.fixtures import FixturesMixin
 from faker import Factory
 
 from sqlalchemy_orm.app import app
-from sqlalchemy_orm.models import db, Bucketlist, BucketlistItem
+from sqlalchemy_orm.models import db, Bucketlist, BucketlistItem, User
 
 
 # Configure the app with the testing configuration
@@ -127,3 +127,12 @@ class AppTestCase(unittest.TestCase, FixturesMixin):
         bucketlists = Bucketlist.query.all()
         self.assertEqual(response.status_code, 204)
         self.assertEqual(len(bucketlists[0].items), 0)
+
+    def test_register_route(self):
+        """Test that POST in /auth/register/ route is working"""
+        new_user = {"username": "stanmd", "password": "123456"}
+
+        response = self.app.post('/auth/register/', data=new_user)
+        users = User.query.all()
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(len(users), 2)

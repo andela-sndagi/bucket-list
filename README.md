@@ -44,21 +44,6 @@ Implement the API in this structure:
 ```
 
 ##Running
-*Peewee ORM*
-
-RUN `cd peewee_orm` to get to the *peewee_orm directory*
-
-RUN `python api.py start` to create the db and tables to be used
-
-RUN `python api.py runserver` and go the pages at:
-
-- [http://localhost:5000/](http://localhost:5000/) (index page)
-- [http://localhost:5000/bucketlists/](http://localhost:5000/bucketlists/) endpoint (GET)
-- [http://localhost:5000/bucketlists/1/items/](http://localhost:5000/bucketlists/1/items/) endpoints (GET)
-
-
-****
-*Sqlalchemy ORM* (MAIN APP)
 
 RUN `cd sqlalchemy_orm` to get to the *sqlalchemy_orm directory*
 

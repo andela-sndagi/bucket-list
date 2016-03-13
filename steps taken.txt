@@ -26,3 +26,8 @@ arguments in endpoints
 tests the CRUD
 
 TASK 1 > separate branch
+Add Users model
+Register and Login
+get token
+decorator to routes
+Test True and False

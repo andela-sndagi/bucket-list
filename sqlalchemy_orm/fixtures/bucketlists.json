@@ -1,9 +1,16 @@
 [
     {
+        "model": "sqlalchemy_orm.models.User",
+        "records": [{
+            "username": "User1",
+            "password": "123456"
+        }]
+    },
+    {
         "model": "sqlalchemy_orm.models.Bucketlist",
         "records": [{
             "name": "BucketList1",
-            "created_by": "1113456"
+            "created_by": "User1"
         }]
     },
     {
