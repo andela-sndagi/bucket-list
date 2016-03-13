@@ -1,17 +1,7 @@
 import datetime
 
-from flask_restful import Resource, fields, marshal_with
+from flask_restful import Resource, reqparse
 from sqlalchemy_orm.models import BucketlistItem, db
-
-
-bucketlist_items_fields = {
-    'id': fields.Integer,
-    'title': fields.String,
-    'bucketlist': fields.Integer,
-    'date_created': fields.String,
-    'date_modified': fields.String,
-    'done': fields.Boolean,
-}
 
 
 class Single_BucketlistItem(Resource):
@@ -20,31 +10,42 @@ class Single_BucketlistItem(Resource):
     [/bucketlists/<id>/items/<item_id>]
     """
 
-    # Get will be deleted eventually
-    @marshal_with(bucketlist_items_fields)
-    def get(self, id, item_id):
-        """GET endpoint"""
-        bucket_list_item = BucketlistItem.query.filter_by(id=item_id, bucketlist=id).first()
-        return bucket_list_item
+    def __init__(self):
+        """Instantiate route request parameters"""
+        self.parser = reqparse.RequestParser()
+        self.parser.add_argument('title', type=str,
+                                 help='Enter item title', location='json')
+        self.parser.add_argument('done', type=bool,
+                                 help="Change to 'true' if item is done",
+                                 location='json')
+        super(Single_BucketlistItem, self).__init__()
 
-
-    @marshal_with(bucketlist_items_fields)
     def put(self, id, item_id):
         """PUT endpoint"""
-        bucket_list_item = BucketlistItem.query.filter_by(id=item_id, bucketlist=id).first()
-        previous_title = bucket_list_item.title
-        bucket_list_item.title = "5 PhD's"
-        bucket_list_item.date_modified = datetime.datetime.now()
-        db.session.commit()
-        return {'message':
-                "BucketlistItem entitled {} Successfully updated to {}".format(
-                    previous_title, bucket_list_item.title)}, 200
 
-    @marshal_with(bucketlist_items_fields)
+        bucket_list_item = BucketlistItem.query.filter_by(
+            bucketlist=id).all()[item_id-1]
+
+        args = self.parser.parse_args()
+        title = args['title']
+        done = args['done']
+        bucket_list_item.title = title
+        bucket_list_item.date_modified = datetime.datetime.now().replace(microsecond=0)
+        bucket_list_item.done = done
+        db.session.commit()
+        return {"message":"BucketlistItem {} Successfully updated".format(
+            bucket_list_item.id)}, 200
+
     def delete(self, id, item_id):
         """DELETE endpoint"""
-        bucket_list_item = BucketlistItem.query.filter_by(id=id).first()
+
+        bucket_list_item = BucketlistItem.query.filter_by(
+            bucketlist=id).all()[item_id-1]
+
         db.session.delete(bucket_list_item)
         db.session.commit()
-        return {'message': "BucketlistItem entitled {} Successfully deleted".format(
-            bucket_list_item.title)}, 204
+
+        # printed on console
+        print "BucketlistItem entitled {} Successfully deleted".format(
+            bucket_list_item.title)
+        return {}, 204

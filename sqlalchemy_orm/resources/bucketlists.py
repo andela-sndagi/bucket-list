@@ -1,4 +1,4 @@
-from flask_restful import Resource, fields, marshal_with
+from flask_restful import Resource, fields, marshal_with, reqparse
 from sqlalchemy_orm.models import Bucketlist, db
 from bucketlist_items import bucketlist_items_fields
 
@@ -17,6 +17,17 @@ class Bucketlists(Resource):
     """
     Bucket List Collection [/bucketlists/]
     """
+
+    def __init__(self):
+        """Instantiate route request parameters"""
+        self.parser = reqparse.RequestParser()
+        self.parser.add_argument('name', type=str,
+                                 help='Enter name of Bucketlist', location='json')
+        self.parser.add_argument('created_by', type=str,
+                                 help="Creator of the bucketlist",
+                                 location='json')
+        super(Bucketlists, self).__init__()
+
     @marshal_with(bucketlist_fields)
     def get(self):
         """GET endpoint"""
@@ -26,11 +37,13 @@ class Bucketlists(Resource):
             bucketlists.append(bucketlist)
         return bucketlists
 
-    @marshal_with(bucketlist_fields)
     def post(self):
         """POST endpoint"""
-        new_bucket_list = Bucketlist(name='Travel', created_by='Stan')
+        args = self.parser.parse_args()
+        name = args['name']
+        created_by = args['created_by']
+        new_bucket_list = Bucketlist(name=name, created_by=created_by)
         name = new_bucket_list.name
         db.session.add(new_bucket_list)
         db.session.commit()
-        return {'message': "{} Successfully created".format(name)}, 201
+        return {'message': "{} Successfully created".format(created_by)}, 201

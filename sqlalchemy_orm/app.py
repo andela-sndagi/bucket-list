@@ -24,7 +24,7 @@ manager = Manager(app)
 
 @manager.command
 def start():
-    """Create DB and tables within"""
+    """Start Application by creating Database and tables within."""
     if prompt_bool(
     "Bucketlist API is initialising...\n\
     Type 'Y/y' if you want to do away with previous data and start\n\
@@ -33,6 +33,7 @@ def start():
 
 @manager.command
 def exit():
+    """Exit application by deleting Database and its contents."""
     if prompt_bool(
     "Bucketlist API is exitting...\n\
     Are you sure you want to exit and lose all your data?\n\

@@ -21,3 +21,8 @@ Test environment - test connection and table creation
 test the above endpoints
 
 > Change over to SQLAlchemy
+test endpoints
+arguments in endpoints
+tests the CRUD
+
+TASK 1 > separate branch

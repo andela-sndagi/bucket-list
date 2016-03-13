@@ -21,8 +21,17 @@ run: ```git clone https://github.com/NdagiStanley/bucketlist.git```
 RUN ```pip install -r requirements.txt```
 
 ##Running
-First we create the db and tables to be used `python api.py start` then
-RUN `python run.py runserver` and go the index page at [http://localhost:5000/](http://localhost:5000/)
+RUN `cd sqlalchemy_orm` to get to the *sqlalchemy_orm directory*
+RUN `python api.py start` to create the db and tables to be used
+RUN `python api.py runserver` and go the pages at:
+
+- [http://localhost:5000/](http://localhost:5000/) (index page)
+- [http://localhost:5000/bucketlists/](http://localhost:5000/bucketlists/) endpoints (GET, POST)
+- [http://localhost:5000/bucketlists/1](http://localhost:5000/bucketlists/1) endpoints (GET, PUT, DELETE)
+- [http://localhost:5000/bucketlists/1/items/](http://localhost:5000/bucketlists/1/items/) endpoints (POST)
+- [http://localhost:5000/bucketlists/1/items/1](http://localhost:5000/bucketlists/1/items/1) endpoints (PUT, DELETE)
+
+RUN `python api.py exit` to exit from the API
 
 
 ##Testing
