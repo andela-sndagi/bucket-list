@@ -5,6 +5,7 @@ fake-factory==0.5.7
 Flask==0.10.1
 Flask-Environments==0.1
 Flask-Fixtures==0.3.3
+Flask-HTTPAuth==3.1.0
 Flask-RESTful==0.3.5
 Flask-Script==2.0.5
 Flask-SQLAlchemy==2.1
