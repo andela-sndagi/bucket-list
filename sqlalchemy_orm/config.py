@@ -12,6 +12,7 @@ class Config(object):
     """Default Settings"""
     DEBUG = False
     TESTING = False
+    SECRET_KEY = "some_random_key"
 
 
 class DevelopmentConfig(Config):

@@ -9,6 +9,9 @@ sys.path.insert(0, parentdir)
 
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
+from passlib.apps import custom_app_context
+from itsdangerous import (TimedJSONWebSignatureSerializer as
+    tokenizer)
 
 
 # Initialise Flask
@@ -24,14 +27,24 @@ class User(db.Model):
     username = db.Column(db.String(20), unique=True)
     password = db.Column(db.String(128))
 
+    def hash_password(self, password):
+        return custom_app_context.encrypt(password)
 
     #  Constructor for User
     def __init__(self, username, password):
         self.username = username
-        self.password = password
+        self.password = self.hash_password(password)
 
     def __repr__(self):
         return '<User %r>' % self.username
+
+    def verify_password(self, password):
+        return custom_app_context.verify(password, self.password)
+
+
+    def generate_token(self, expiration=300):
+        s = tokenizer(app.config['SECRET_KEY'], expires_in=expiration)
+        return s.dumps({'id': self.id})
 
 
 class Bucketlist(db.Model):

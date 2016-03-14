@@ -9,11 +9,12 @@ sys.path.insert(0, parentdir)
 
 from flask.ext.script import Manager, prompt_bool
 from flask_restful import Api, fields, marshal_with, Resource
+
 from sqlalchemy_orm.models import Bucketlist, BucketlistItem, app, initialise, drop
 
 # Resources
 from resources import Index
-from resources.users import Register
+from resources.users import Register, Login
 from resources.bucketlists import Bucketlists
 from resources.bucketlist_items import BucketlistItems
 from resources.single_bucketlist import SingleBucketlist
@@ -45,7 +46,7 @@ api = Api(app)
 # URLs
 api.add_resource(Index, '/')
 api.add_resource(Register, '/auth/register/')
-# api.add_resource(Login, '/auth/login/')
+api.add_resource(Login, '/auth/login/')
 api.add_resource(Bucketlists, '/bucketlists/')
 api.add_resource(SingleBucketlist, '/bucketlists/<int:id>')
 api.add_resource(BucketlistItems, '/bucketlists/<int:id>/items/')
