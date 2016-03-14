@@ -1,7 +1,7 @@
 import datetime
 
 from flask_restful import Resource, fields, marshal_with, reqparse
-from sqlalchemy_orm.models import Bucketlist, db
+from sqlalchemy_orm.models import Bucketlist, db, auth
 from bucketlist_items import bucketlist_items_fields
 
 
@@ -28,17 +28,19 @@ class SingleBucketlist(Resource):
                                  location='json')
         super(SingleBucketlist, self).__init__()
 
+    @auth.login_required
     @marshal_with(bucketlist_fields)
     def get(self, id):
         """GET endpoint"""
-        bucketlist = Bucketlist.query.filter_by(id=id).one()
+        bucketlist = Bucketlist.query.filter_by(id=id).first()
         return bucketlist
 
+    @auth.login_required
     def put(self, id):
         """PUT endpoint"""
         args = self.parser.parse_args()
         name = args['name']
-        bucket_list = Bucketlist.query.filter_by(id=id).one()
+        bucket_list = Bucketlist.query.filter_by(id=id).first()
         bucket_list.name = name
         bucket_list.date_modified = datetime.datetime.now(
             ).replace(microsecond=0)
@@ -46,6 +48,7 @@ class SingleBucketlist(Resource):
         return {'message': "Bucketlist #{} Successfully updated".format(
             bucket_list.id)}, 200
 
+    @auth.login_required
     def delete(self, id):
         """DELETE endpoint"""
         bucket_list = Bucketlist.query.filter_by(id=id).one()

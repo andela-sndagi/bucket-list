@@ -1,3 +1,4 @@
+from flask import abort, jsonify, g
 from flask_restful import Resource, reqparse
 from sqlalchemy_orm.models import User, db
 
@@ -26,6 +27,11 @@ class Register(Resource):
         username = args['username']
         password = args['password']
         conf_password = args['conf_password']
+
+        if username is None or password is None:
+            abort(400) # missing arguments
+        if User.query.filter_by(username=username).first() is not None:
+            abort(400)
         if password == conf_password:
             new_user = User(username=username, password=password)
             username = new_user.username
@@ -55,8 +61,8 @@ class Login(Resource):
         username = args['username']
         password = args['password']
 
-        user = User.query.filter_by(username=username).one()
+        user = User.query.filter_by(username=username).first()
         if user.verify_password(password):
             token = user.generate_token()
-            return {'token': token.decode('ascii')}, 200
+            return jsonify({'token': token.decode('ascii')})
         return {"message": "Wrong password. Please try again"}, 404

@@ -1,5 +1,5 @@
 from flask_restful import Resource, fields, marshal_with, reqparse
-from sqlalchemy_orm.models import BucketlistItem, db
+from sqlalchemy_orm.models import BucketlistItem, db, auth
 
 
 bucketlist_items_fields = {
@@ -25,6 +25,7 @@ class BucketlistItems(Resource):
                                  help='Enter item title', location='json')
         super(BucketlistItems, self).__init__()
 
+    @auth.login_required
     def post(self, id):
         """post on the url"""
         args = self.parser.parse_args()

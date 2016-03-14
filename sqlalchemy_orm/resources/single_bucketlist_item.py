@@ -1,7 +1,7 @@
 import datetime
 
 from flask_restful import Resource, reqparse
-from sqlalchemy_orm.models import BucketlistItem, db
+from sqlalchemy_orm.models import BucketlistItem, db, auth
 
 
 class SingleBucketlistItem(Resource):
@@ -20,6 +20,7 @@ class SingleBucketlistItem(Resource):
                                  location='json')
         super(SingleBucketlistItem, self).__init__()
 
+    @auth.login_required
     def put(self, id, item_id):
         """PUT endpoint"""
 
@@ -37,6 +38,7 @@ class SingleBucketlistItem(Resource):
         return {"message": "BucketlistItem {0} Successfully updated".
                 format(bucket_list_item.id)}, 200
 
+    @auth.login_required
     def delete(self, id, item_id):
         """DELETE endpoint"""
 

@@ -1,5 +1,6 @@
 from flask_restful import Resource, fields, marshal_with, reqparse
-from sqlalchemy_orm.models import Bucketlist, db
+
+from sqlalchemy_orm.models import Bucketlist, db, auth
 from bucketlist_items import bucketlist_items_fields
 
 
@@ -28,6 +29,7 @@ class Bucketlists(Resource):
                                  location='json')
         super(Bucketlists, self).__init__()
 
+    @auth.login_required
     @marshal_with(bucketlist_fields)
     def get(self):
         """GET endpoint"""
@@ -37,6 +39,7 @@ class Bucketlists(Resource):
             bucketlists.append(bucketlist)
         return bucketlists
 
+    @auth.login_required
     def post(self):
         """POST endpoint"""
         args = self.parser.parse_args()

@@ -9,9 +9,11 @@ sys.path.insert(0, parentdir)
 
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
+from flask_httpauth import HTTPBasicAuth
+
 from passlib.apps import custom_app_context
-from itsdangerous import (TimedJSONWebSignatureSerializer as
-    tokenizer)
+from itsdangerous import (TimedJSONWebSignatureSerializer
+                          as tokenizer, BadSignature, SignatureExpired)
 
 
 # Initialise Flask
@@ -20,6 +22,7 @@ app = Flask(__name__)
 # Database instance
 db = SQLAlchemy(app)
 
+auth = HTTPBasicAuth()
 
 class User(db.Model):
     """User model"""
@@ -45,6 +48,18 @@ class User(db.Model):
     def generate_token(self, expiration=300):
         s = tokenizer(app.config['SECRET_KEY'], expires_in=expiration)
         return s.dumps({'id': self.id})
+
+    @staticmethod
+    def verify_auth_token(token):
+        s = tokenizer(app.config['SECRET_KEY'])
+        try:
+            data = s.loads(token)
+        except SignatureExpired:
+            return None # valid token, but expired
+        except BadSignature:
+            return None # invalid token
+        user = User.query.get(data['id'])
+        return user
 
 
 class Bucketlist(db.Model):

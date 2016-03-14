@@ -60,7 +60,7 @@ class AppTestCase(unittest.TestCase, FixturesMixin):
         """Test bucketlistitems entries in fixtures"""
         items = BucketlistItem.query.all()
         self.assertEqual(len(items) == Bucketlist.query.count(), 1)
-        bl1 = Bucketlist.query.filter(Bucketlist.name == 'BucketList1').one()
+        bl1 = Bucketlist.query.filter(Bucketlist.name == 'BucketList1').first()
         for item in items:
             assert item.bucketlist_id == bl1
 
@@ -130,12 +130,11 @@ class AppTestCase(unittest.TestCase, FixturesMixin):
 
     def test_register_route(self):
         """Test that POST in /auth/register/ route is working"""
-        # register = {"username": "stanmd", "password": "123456", "conf_password": "123456"}
+        register = {"username": "stanmd", "password": "123456", "conf_password": "123456"}
 
         users = User.query.all()
         self.assertEqual(len(users), 1)
         # response = self.app.post('/auth/register/', data=register)
-        # import ipdb; ipdb.set_trace()
         # self.assertEqual(response.status_code, 201)
         # self.assertEqual(len(users), 2)
 

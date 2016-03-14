@@ -7,10 +7,13 @@ currentdir = os.path.dirname(os.path.abspath(
 parentdir = os.path.dirname(currentdir)
 sys.path.insert(0, parentdir)
 
+from flask import request
 from flask.ext.script import Manager, prompt_bool
 from flask_restful import Api, fields, marshal_with, Resource
+from sqlalchemy import create_engine, desc, func, orm
 
-from sqlalchemy_orm.models import Bucketlist, BucketlistItem, app, initialise, drop
+
+from sqlalchemy_orm.models import Bucketlist, BucketlistItem, app, initialise, drop, User, auth
 
 # Resources
 from resources import Index
@@ -23,6 +26,42 @@ from resources.single_bucketlist_item import SingleBucketlistItem
 
 # Setup manager to allow runserver, shell and migrate at runtime
 manager = Manager(app)
+
+def init_session():
+    """
+    Configures the current database and returns a session instance for use
+    during CRUD operations.
+    """
+    engine = create_engine(app.config.get('SQLALCHEMY_DATABASE_URI'))
+    session = orm.sessionmaker()
+    session.configure(bind=engine)
+    return session()
+
+init = init_session()
+
+access_denied = {"message": "Not authorized"}
+
+def get_request_token():
+    """
+    Retrieve a user's token from the username key of the request's header.
+    """
+    return request.headers.get('username')
+
+
+def is_bucketlist_owner(bucketlist):
+    token = get_request_token()
+    # Ensure the owner of the bucketlist is the only one who can update it
+    if User.verify_auth_token(token).username == bucketlist.created_by:
+        return True
+    return False
+
+# @auth.verify_token
+def verify_token(token, password):
+    token = get_request_token()
+    if token:
+        user = User.verify_auth_token(token, init)
+        return user
+    return False
 
 @manager.command
 def start():
