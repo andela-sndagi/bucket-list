@@ -1,6 +1,7 @@
-from flask import abort, jsonify, g
+from flask import jsonify, g
 from flask_restful import Resource, reqparse
-from sqlalchemy_orm.models import User, db
+
+from sqlalchemy_orm.models import User, db, auth
 
 
 class Register(Resource):
@@ -55,13 +56,14 @@ class Login(Resource):
                                  location='json')
         super(Login, self).__init__()
 
+    # @auth.login_required
     def post(self):
-        """POST endpoint"""
+        """POST endpoint that requires that you enter username and password"""
         args = self.parser.parse_args()
         username = args['username']
         password = args['password']
 
-        user = User.query.filter_by(username=username).first()
+        user = User.query.filter_by(username=username).one()
         if user.verify_password(password):
             token = user.generate_token()
             return jsonify({'token': token.decode('ascii')})

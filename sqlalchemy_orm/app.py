@@ -13,7 +13,7 @@ from flask_restful import Api, fields, marshal_with, Resource
 from sqlalchemy import create_engine, desc, func, orm
 
 
-from sqlalchemy_orm.models import Bucketlist, BucketlistItem, app, initialise, drop, User, auth
+from sqlalchemy_orm.models import Bucketlist, BucketlistItem, app, initialise, drop, User
 
 # Resources
 from resources import Index
