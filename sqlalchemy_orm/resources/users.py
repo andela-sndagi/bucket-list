@@ -1,4 +1,4 @@
-from flask import jsonify, g
+from flask import jsonify, g, abort
 from flask_restful import Resource, reqparse
 
 from sqlalchemy_orm.models import User, db, auth
@@ -63,7 +63,7 @@ class Login(Resource):
         username = args['username']
         password = args['password']
 
-        user = User.query.filter_by(username=username).one()
+        user = User.query.filter_by(username=username).first()
         if user.verify_password(password):
             token = user.generate_token()
             return jsonify({'token': token.decode('ascii')})
