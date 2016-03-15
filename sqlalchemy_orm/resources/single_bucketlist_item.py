@@ -4,7 +4,7 @@ from flask_restful import Resource, reqparse
 from sqlalchemy_orm.models import BucketlistItem, db
 
 
-class Single_BucketlistItem(Resource):
+class SingleBucketlistItem(Resource):
     """
     Bucketlist items
     [/bucketlists/<id>/items/<item_id>]

@@ -19,6 +19,7 @@ db = SQLAlchemy(app)
 
 
 class Bucketlist(db.Model):
+    """Model for Bucketlist"""
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(20), unique=True)
     date_created = db.Column(db.DateTime,
@@ -37,6 +38,7 @@ class Bucketlist(db.Model):
 
 
 class BucketlistItem(db.Model):
+    """Model for item in Bucketlist"""
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(80))
     bucketlist = db.Column(db.Integer, db.ForeignKey('bucketlist.id'))
@@ -57,7 +59,9 @@ class BucketlistItem(db.Model):
 
 
 def initialise():
+    """Initialize app by creating db and its dpendencies"""
     db.create_all()
 
 def drop():
+    """Delete db and its conten"""
     db.drop_all()

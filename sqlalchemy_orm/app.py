@@ -15,8 +15,8 @@ from sqlalchemy_orm.models import Bucketlist, BucketlistItem, app, initialise, d
 from resources import Index
 from resources.bucketlists import Bucketlists
 from resources.bucketlist_items import BucketlistItems
-from resources.single_bucketlist import Single_Bucketlist
-from resources.single_bucketlist_item import Single_BucketlistItem
+from resources.single_bucketlist import SingleBucketlist
+from resources.single_bucketlist_item import SingleBucketlistItem
 
 
 # Setup manager to allow runserver, shell and migrate at runtime
@@ -47,6 +47,6 @@ api = Api(app)
 # URLs
 api.add_resource(Index, '/')
 api.add_resource(Bucketlists, '/bucketlists/')
-api.add_resource(Single_Bucketlist, '/bucketlists/<int:id>')
+api.add_resource(SingleBucketlist, '/bucketlists/<int:id>')
 api.add_resource(BucketlistItems, '/bucketlists/<int:id>/items/')
-api.add_resource(Single_BucketlistItem, '/bucketlists/<int:id>/items/<int:item_id>')
+api.add_resource(SingleBucketlistItem, '/bucketlists/<int:id>/items/<int:item_id>')

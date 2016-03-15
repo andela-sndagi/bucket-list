@@ -26,10 +26,11 @@ class BucketlistItems(Resource):
         super(BucketlistItems, self).__init__()
 
     def post(self, id):
+        """post on the url"""
         args = self.parser.parse_args()
         title = args['title']
         new_bucket_list_item = BucketlistItem(title=title, bucketlist=id)
         title = new_bucket_list_item.title
         db.session.add(new_bucket_list_item)
         db.session.commit()
-        return {'message': "Item '{}' successfully created in Bucketlist #{}".format(title, id)}, 201
+        return {'message': "Item '{0}' successfully created in Bucketlist #{1}".format(title, id)}, 201

@@ -15,7 +15,7 @@ bucketlist_fields = {
 }
 
 
-class Single_Bucketlist(Resource):
+class SingleBucketlist(Resource):
     """
     A Single Bucketlist [/bucketlists/<>]
     """
