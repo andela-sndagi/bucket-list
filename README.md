@@ -52,7 +52,34 @@ RUN `python api.py start` to create the db and tables to be used
 RUN `python api.py runserver` and go the pages at:
 
 - [http://localhost:5000/](http://localhost:5000/) index page (**GET**)
+- [http://localhost:5000/auth/register/](http://localhost:5000/auth/register/) signup page (**POST**)
+```json
+{
+  "username": "user1",
+  "password": "p@ssw0rd",
+  "conf_password": "p@ssw0rd"
+}
+```
+- [http://localhost:5000/auth/login/](http://localhost:5000/auth/login/) login page (**POST**)
+```json
+{
+  "username": "user1",
+  "password": "p@ssw0rd"
+}
+```
+This returns a token in this format:
+```json
+{
+  "token": "eyJhbGciOiJIUzI1NiIsImV4cCI6MTQ1ODEwNjkyMCwiaWF0IjoxNDU4MTAzMzIwfQ.eyJpZCI6Nn0.irPIrqstGIupCD428dtSOxV8zzwm5IgoCLpTsk-oH5k"
+}
+```
 - [http://localhost:5000/bucketlists/](http://localhost:5000/bucketlists/) endpoints (**GET**, **POST**)
+Preferably use curl in this manner in the terminal:
+
+```
+curl -u eyJhbGciOiJIUzI1NiIsImV4cCI6MTQ1ODEwNjUwOCwiaWF0IjoxNDU4MTAyOTA4fQ.eyJpZCI6Nn0.Ekt_3nmlzJokR-exLg7uwiRrbUFPFB0LMAk2J_mJ0MI:unused -i -X GET http://127.0.0.1:5000/bucketlists/
+```
+The token will be used in all subsequent requests. Otherwise the requests will be unauthorised.
 
 In **POST** the body should be in this format:
 ```json

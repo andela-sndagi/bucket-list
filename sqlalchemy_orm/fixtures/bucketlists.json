@@ -3,7 +3,7 @@
         "model": "sqlalchemy_orm.models.User",
         "records": [{
             "username": "User1",
-            "password": "$6$rounds=691383$cG7mOg2rqUf8vmFr$RetHmP5vAjEtmewIvgNKDXVdsOQ7NkEx2RCC1sIph.6M2U3d6bdN5xsT.91wZFpS8pTgv4V/Sv9oCeqxzGpKs1"
+            "password": "123456"
         }]
     },
     {

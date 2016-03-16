@@ -38,7 +38,7 @@ class Register(Resource):
             username = new_user.username
             db.session.add(new_user)
             db.session.commit()
-            return {'message': "User '{}' Successfully registered".format(username)}, 201
+            return {'message': "User '{}' successfully registered".format(username)}, 201
         return {"message": "Passwords don't match"}, 404
 
 class Login(Resource):
