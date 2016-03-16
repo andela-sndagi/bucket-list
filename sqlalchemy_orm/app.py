@@ -25,11 +25,8 @@ manager = Manager(app)
 @manager.command
 def start():
     """Start Application by creating Database and tables within."""
-    if prompt_bool(
-    "Bucketlist API is initialising...\n\
-    Type 'Y/y' if you want to do away with previous data and start\n\
-    Type 'N/n' if you want to keep the data and proceed to 'runserver'"):
-        initialise()
+    print "Bucketlist API is initialising...\n  RUN 'python api.py exit' afterwhich you\n  RUN 'python api.py start' if you want to do away with previous data and start"
+    initialise()
 
 @manager.command
 def exit():

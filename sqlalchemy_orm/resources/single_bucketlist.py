@@ -26,7 +26,7 @@ class SingleBucketlist(Resource):
         self.parser.add_argument('name', type=str,
                                  help='Enter name of Bucketlist',
                                  location='json')
-        super(Single_Bucketlist, self).__init__()
+        super(SingleBucketlist, self).__init__()
 
     @marshal_with(bucketlist_fields)
     def get(self, id):

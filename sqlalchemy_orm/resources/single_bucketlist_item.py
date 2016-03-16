@@ -18,7 +18,7 @@ class SingleBucketlistItem(Resource):
         self.parser.add_argument('done', type=bool,
                                  help="Change to 'true' if item is done",
                                  location='json')
-        super(Single_BucketlistItem, self).__init__()
+        super(SingleBucketlistItem, self).__init__()
 
     def put(self, id, item_id):
         """PUT endpoint"""
@@ -30,11 +30,12 @@ class SingleBucketlistItem(Resource):
         title = args['title']
         done = args['done']
         bucket_list_item.title = title
-        bucket_list_item.date_modified = datetime.datetime.now().replace(microsecond=0)
+        bucket_list_item.date_modified = datetime.datetime.now().\
+            replace(microsecond=0)
         bucket_list_item.done = done
         db.session.commit()
-        return {"message":"BucketlistItem {} Successfully updated".format(
-            bucket_list_item.id)}, 200
+        return {"message": "BucketlistItem {0} Successfully updated".
+                format(bucket_list_item.id)}, 200
 
     def delete(self, id, item_id):
         """DELETE endpoint"""
