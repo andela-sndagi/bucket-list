@@ -1,0 +1,16 @@
+[
+    {
+        "model": "sqlalchemy_orm.models.Bucketlist",
+        "records": [{
+            "name": "BucketList1",
+            "created_by": "1113456"
+        }]
+    },
+    {
+        "model": "sqlalchemy_orm.models.BucketlistItem",
+        "records": [{
+            "title": "I need to do X",
+            "bucketlist": 1
+        }]
+    }
+]

@@ -1,0 +1,28 @@
+Entries in this document as such that would have be in Pivotal tracker or Trello
+This being the standard, even at Andela (world-class); this document will stand for purposes of this repository.
+
+# Steps chronologically and/ or logically
+
+Flask skeleton
+Tests running
+Setup badges - coveralls, CI, quantified code, code climate (2 of them)
+Image in README.md
+COMPLETE
+    - commit 404198500533165e0bb93b5de6d49a8728809a95, Complete setup for creating API
+
+Create models
+Choose ORM
+Link db
+create tables from models
+get API endpoints
+/bucketlists/ and /bucketlists/<>/items/
+DB environment for Testing
+Test environment - test connection and table creation
+test the above endpoints
+
+> Change over to SQLAlchemy
+test endpoints
+arguments in endpoints
+tests the CRUD
+
+TASK 1 > separate branch
