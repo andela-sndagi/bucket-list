@@ -31,7 +31,7 @@ Implement the API in this structure:
   "items": [
     {
       "id": 1,
-      "name": "I need to do X",
+      "title": "I need to do X",
       "date_created": "2015-08-12 11:57:23",
       "date_modified": "2015-08-12 11:57:23",
       "done": false

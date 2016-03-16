@@ -46,4 +46,4 @@ class Bucketlists(Resource):
         name = new_bucket_list.name
         db.session.add(new_bucket_list)
         db.session.commit()
-        return {'message': "{} Successfully created".format(name)}, 201
+        return {'message': "'{}' successfully created".format(name)}, 201
