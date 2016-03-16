@@ -20,6 +20,29 @@ run: ```git clone https://github.com/NdagiStanley/bucketlist.git```
 3. In the virtual environment install DEPENDENCIES
 RUN ```pip install -r requirements.txt```
 
+##Task
+
+Implement the API in this structure:
+
+```json
+{
+  "id": 1,
+  "name": "BucketList1",
+  "items": [
+    {
+      "id": 1,
+      "name": "I need to do X",
+      "date_created": "2015-08-12 11:57:23",
+      "date_modified": "2015-08-12 11:57:23",
+      "done": false
+    }
+  ],
+  "date_created": "2015-08-12 11:57:23",
+  "date_modified": "2015-08-12 11:57:23",
+  "created_by": "1113456"
+}
+```
+
 ##Running
 *Peewee ORM*
 
@@ -43,11 +66,32 @@ RUN `python api.py start` to create the db and tables to be used
 
 RUN `python api.py runserver` and go the pages at:
 
-- [http://localhost:5000/](http://localhost:5000/) (index page)
-- [http://localhost:5000/bucketlists/](http://localhost:5000/bucketlists/) endpoints (GET, POST)
-- [http://localhost:5000/bucketlists/1](http://localhost:5000/bucketlists/1) endpoints (GET, PUT, DELETE)
-- [http://localhost:5000/bucketlists/1/items/](http://localhost:5000/bucketlists/1/items/) endpoints (POST)
-- [http://localhost:5000/bucketlists/1/items/1](http://localhost:5000/bucketlists/1/items/1) endpoints (PUT, DELETE)
+- [http://localhost:5000/](http://localhost:5000/) index page (**GET**)
+- [http://localhost:5000/bucketlists/](http://localhost:5000/bucketlists/) endpoints (**GET**, **POST**)
+in **POST** the body should be in this format:
+```json
+{
+  "name": "Travel",
+  "created_by": "user1"
+}
+```
+- [http://localhost:5000/bucketlists/1](http://localhost:5000/bucketlists/1) endpoints (**GET**, **PUT**, **DELETE**)
+the body for **PUT** here is same as the above body :point_up_2:
+- [http://localhost:5000/bucketlists/1/items/](http://localhost:5000/bucketlists/1/items/) endpoints (**POST**)
+in the format below:
+```json
+{
+  "title": "Travel"
+}
+```
+- [http://localhost:5000/bucketlists/1/items/1](http://localhost:5000/bucketlists/1/items/1) endpoints (**PUT**, **DELETE**)
+in **PUT** the body should be in this format:
+```json
+{
+  "title": "Travel to Mombasa",
+  "done": true
+}
+```
 
 RUN `python api.py exit` to exit from the API
 
