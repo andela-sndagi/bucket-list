@@ -68,7 +68,8 @@ RUN `python api.py runserver` and go the pages at:
 
 - [http://localhost:5000/](http://localhost:5000/) index page (**GET**)
 - [http://localhost:5000/bucketlists/](http://localhost:5000/bucketlists/) endpoints (**GET**, **POST**)
-in **POST** the body should be in this format:
+
+In **POST** the body should be in this format:
 ```json
 {
   "name": "Travel",
@@ -78,14 +79,16 @@ in **POST** the body should be in this format:
 - [http://localhost:5000/bucketlists/1](http://localhost:5000/bucketlists/1) endpoints (**GET**, **PUT**, **DELETE**)
 the body for **PUT** here is same as the above body :point_up_2:
 - [http://localhost:5000/bucketlists/1/items/](http://localhost:5000/bucketlists/1/items/) endpoints (**POST**)
-in the format below:
+
+In the format below:
 ```json
 {
   "title": "Travel"
 }
 ```
 - [http://localhost:5000/bucketlists/1/items/1](http://localhost:5000/bucketlists/1/items/1) endpoints (**PUT**, **DELETE**)
-in **PUT** the body should be in this format:
+
+In **PUT** the body should be in this format:
 ```json
 {
   "title": "Travel to Mombasa",
