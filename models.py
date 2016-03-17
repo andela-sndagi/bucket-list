@@ -7,11 +7,8 @@ currentdir = os.path.dirname(os.path.abspath(
 parentdir = os.path.dirname(currentdir)
 sys.path.insert(0, parentdir)
 
-from flask.ext.sqlalchemy import SQLAlchemy
-from app import app
+from app import db
 
-# Database instance
-db = SQLAlchemy(app)
 
 class Bucketlist(db.Model):
     """Model for Bucketlist"""

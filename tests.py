@@ -7,7 +7,6 @@ currentdir = os.path.dirname(os.path.abspath(
 parentdir = os.path.dirname(currentdir)
 sys.path.insert(0, parentdir)
 
-from flask import g
 import unittest
 from flask.ext.fixtures import FixturesMixin
 from bucketlist.app import app
@@ -28,8 +27,6 @@ class AppTestCase(unittest.TestCase, FixturesMixin):
 
     # Specify the fixtures file(s) you want to load
     fixtures = ['bucketlists.json']
-
-    g.bucketlist = {"name": "Travel", "created_by": "Stan"}
 
 
     def setUp(self):
@@ -69,7 +66,9 @@ class AppTestCase(unittest.TestCase, FixturesMixin):
 
     def test_post_bucketlists_route(self):
         """Test that POST in /bucketlists/ route is working"""
-        response = self.app.post('/bucketlists/', data=g.bucketlist)
+        bucketlist = {"name": "Travel", "created_by": "Stan"}
+
+        response = self.app.post('/bucketlists/', data=bucketlist)
         bucketlists = Bucketlist.query.all()
         self.assertEqual(response.status_code, 201)
         self.assertEqual(len(bucketlists), 2)
@@ -77,9 +76,11 @@ class AppTestCase(unittest.TestCase, FixturesMixin):
 
     def test_get_specific_bucketlist_route(self):
         """Test that GET in /bucketlists/<> route is working"""
+        bucketlist = {"name": "Travel", "created_by": "Stan"}
+
         response = self.app.get('/bucketlists/1')
         self.assertEqual(response.status_code, 200)
-        response = self.app.post('/bucketlists/', data=g.bucketlist)
+        response = self.app.post('/bucketlists/', data=bucketlist)
         response = self.app.get('/bucketlists/2')
         self.assertEqual(response.data['name'], 'Travel')
         self.assertEqual(response.status_code, 200)
@@ -129,4 +130,3 @@ class AppTestCase(unittest.TestCase, FixturesMixin):
         bucketlists = Bucketlist.query.all()
         self.assertEqual(response.status_code, 204)
         self.assertEqual(len(bucketlists[0].items), 0)
-
