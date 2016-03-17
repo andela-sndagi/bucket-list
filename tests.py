@@ -7,6 +7,7 @@ currentdir = os.path.dirname(os.path.abspath(
 parentdir = os.path.dirname(currentdir)
 sys.path.insert(0, parentdir)
 
+from flask import g
 import unittest
 from flask.ext.fixtures import FixturesMixin
 from bucketlist.app import app
@@ -27,6 +28,9 @@ class AppTestCase(unittest.TestCase, FixturesMixin):
 
     # Specify the fixtures file(s) you want to load
     fixtures = ['bucketlists.json']
+
+    g.bucketlist = {"name": "Travel", "created_by": "Stan"}
+
 
     def setUp(self):
         """Setting up the environment for testing"""
@@ -65,9 +69,64 @@ class AppTestCase(unittest.TestCase, FixturesMixin):
 
     def test_post_bucketlists_route(self):
         """Test that POST in /bucketlists/ route is working"""
-        bucketlist = {"name": "Travel", "created_by": "Stan"}
-
-        response = self.app.post('/bucketlists/', data=bucketlist)
+        response = self.app.post('/bucketlists/', data=g.bucketlist)
         bucketlists = Bucketlist.query.all()
         self.assertEqual(response.status_code, 201)
+        self.assertEqual(len(bucketlists), 2)
+
+
+    def test_get_specific_bucketlist_route(self):
+        """Test that GET in /bucketlists/<> route is working"""
+        response = self.app.get('/bucketlists/1')
+        self.assertEqual(response.status_code, 200)
+        response = self.app.post('/bucketlists/', data=g.bucketlist)
+        response = self.app.get('/bucketlists/2')
+        self.assertEqual(response.data['name'], 'Travel')
+        self.assertEqual(response.status_code, 200)
+
+    def test_put_specific_bucketlist_route(self):
+        """Test that POST in /bucketlists/<> route is working"""
+        # Update bucketlist
+        bucketlist = {"name": "New Bucketlist", "created_by": "Stan"}
+
+        response = self.app.put('/bucketlists/1', data=bucketlist)
+        self.assertEqual(response.status_code, 200)
+        bucketlists = Bucketlist.query.all()
         self.assertEqual(len(bucketlists), 1)
+        response = self.app.get('/bucketlists/1')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['name'], 'New Bucketlist')
+
+    def test_delete_specific_bucketlist_route(self):
+        """Test that POST in /bucketlists/<> route is working"""
+        response = self.app.delete('/bucketlists/1')
+        bucketlists = Bucketlist.query.all()
+        self.assertEqual(response.status_code, 204)
+        self.assertEqual(len(bucketlists), 0)
+
+    def test_post_bucketlistitems_route(self):
+        """Test that POST in /bucketlists/<>/items/ route is working"""
+        bucketlist_item = {"title": "Travel"}
+
+        response = self.app.post('/bucketlists/1/items/', data=bucketlist_item)
+        bucketlists = Bucketlist.query.all()
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(len(bucketlists[0].items), 2)
+
+    def test_put_specific_bucketlistitem_route(self):
+        """Test that PUT in /bucketlists/<>/items/<> route is working"""
+        # Updated item
+        bucketlist_item = {"title": "I need to do Y"}
+
+        response = self.app.put('/bucketlists/1/items/1', data=bucketlist_item)
+        bucketlists = Bucketlist.query.all()
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(bucketlists[0].items), 1)
+
+    def test_delete_specific_bucketlistitem_route(self):
+        """Test that DELETE in /bucketlists/<>/items/<> route is working"""
+        response = self.app.delete('/bucketlists/1/items/1')
+        bucketlists = Bucketlist.query.all()
+        self.assertEqual(response.status_code, 204)
+        self.assertEqual(len(bucketlists[0].items), 0)
+
