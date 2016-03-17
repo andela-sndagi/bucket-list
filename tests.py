@@ -57,3 +57,17 @@ class AppTestCase(unittest.TestCase, FixturesMixin):
         bl1 = Bucketlist.query.filter(Bucketlist.name == 'BucketList1').first()
         for item in items:
             assert item.bucketlist_id == bl1
+
+    def test_get_bucketlists_route(self):
+        """Test that GET in /bucketlists/ route is working"""
+        response = self.app.get('/bucketlists/')
+        self.assertEqual(response.status_code, 200)
+
+    def test_post_bucketlists_route(self):
+        """Test that POST in /bucketlists/ route is working"""
+        bucketlist = {"name": "Travel", "created_by": "Stan"}
+
+        response = self.app.post('/bucketlists/', data=bucketlist)
+        bucketlists = Bucketlist.query.all()
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(len(bucketlists), 1)
