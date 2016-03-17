@@ -2,18 +2,16 @@
 
 import os, sys
 import inspect
-currentdir = os.path.dirname(os.path.abspath(
-    inspect.getfile(inspect.currentframe())))
-parentdir = os.path.dirname(currentdir)
-sys.path.insert(0, parentdir)
+# currentdir = os.path.dirname(os.path.abspath(
+#     inspect.getfile(inspect.currentframe())))
+# parentdir = os.path.dirname(currentdir)
+# sys.path.insert(0, parentdir)
 
 from flask import request
-from flask.ext.script import Manager, prompt_bool
+from flask_httpauth import HTTPBasicAuth
 from flask_restful import Api, fields, marshal_with, Resource
 from sqlalchemy import create_engine, desc, func, orm
 
-
-from sqlalchemy_orm.models import Bucketlist, BucketlistItem, app, initialise, drop, User
 
 # Resources
 from resources import Index
@@ -24,22 +22,31 @@ from resources.single_bucketlist import SingleBucketlist
 from resources.single_bucketlist_item import SingleBucketlistItem
 
 
-# Setup manager to allow runserver, shell and migrate at runtime
-manager = Manager(app)
-
-def init_session():
-    """
-    Configures the current database and returns a session instance for use
-    during CRUD operations.
-    """
-    engine = create_engine(app.config.get('SQLALCHEMY_DATABASE_URI'))
-    session = orm.sessionmaker()
-    session.configure(bind=engine)
-    return session()
-
-init = init_session()
-
 access_denied = {"message": "Not authorized"}
+
+# Initialise Flask
+app = Flask(__name__)
+
+# Database instance
+db = SQLAlchemy(app)
+
+auth = HTTPBasicAuth()
+
+app.config.from_object('sqlalchemy_orm.config.DevelopmentConfig')
+
+# def init_session():
+#     """
+#     Configures the current database and returns a session instance for use
+#     during CRUD operations.
+#     """
+#     engine = create_engine(app.config.get('SQLALCHEMY_DATABASE_URI'))
+#     session = orm.sessionmaker()
+#     session.configure(bind=engine)
+#     return session()
+
+# init = init_session()
+
+
 
 def get_request_token():
     """
@@ -55,29 +62,17 @@ def is_bucketlist_owner(bucketlist):
         return True
     return False
 
-# @auth.verify_token
-def verify_token(token, password):
-    token = get_request_token()
-    if token:
-        user = User.verify_auth_token(token, init)
-        return user
-    return False
-
-@manager.command
-def start():
-    """Start Application by creating Database and tables within."""
-    print "Bucketlist API is initialising... \n(If it is your first RUN you will have demo data according to the TASK segment in the README)\n  (If you want to do away with previous data and start)\n     RUN 'python api.py exit' afterwhich you\n     RUN 'python api.py start' \n  Otherwise proceed to run the app 'python api.py runserver'"
-    initialise()
-
-@manager.command
-def exit():
-    """Exit application by deleting Database and its contents."""
-    if prompt_bool(
-    "Bucketlist API is exitting...\n\
-    Are you sure you want to exit and lose all your data?\n\
-        Type 'Y/y' - YES\n\
-        Type 'N/n' - NO"):
-        drop()
+@auth.verify_password
+def verify_password(username_or_token, password):
+    # first try to authenticate by token
+    user = User.verify_auth_token(username_or_token)
+    if not user:
+        # try to authenticate with username/password
+        user = User.query.filter_by(username = username_or_token).first()
+        if not user or not user.verify_password(password):
+            return False
+    g.user = user
+    return True
 
 # Instance of Api
 api = Api(app)

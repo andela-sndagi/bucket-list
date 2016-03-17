@@ -1,6 +1,6 @@
 from flask_restful import Resource, fields, marshal_with, reqparse
-from sqlalchemy_orm.models import BucketlistItem, db, auth
-
+from sqlalchemy_orm.models import BucketlistItem
+from sqlalchemy_orm.app import db, auth
 
 bucketlist_items_fields = {
     'id': fields.Integer,

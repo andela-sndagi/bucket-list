@@ -1,4 +1,6 @@
 # sqlalchemy_orm/models.py
+from app import app, db
+# from app import app, db
 
 import os, sys
 import inspect
@@ -9,20 +11,10 @@ sys.path.insert(0, parentdir)
 
 from flask import Flask, g
 from flask.ext.sqlalchemy import SQLAlchemy
-from flask_httpauth import HTTPBasicAuth
 
 from passlib.apps import custom_app_context as pwd_context
 from itsdangerous import (TimedJSONWebSignatureSerializer
                           as tokenizer, BadSignature, SignatureExpired)
-
-
-# Initialise Flask
-app = Flask(__name__)
-
-# Database instance
-db = SQLAlchemy(app)
-
-auth = HTTPBasicAuth()
 
 
 class User(db.Model):
@@ -60,19 +52,6 @@ class User(db.Model):
 
     def __repr__(self):
         return '<User %r>' % self.username
-
-
-@auth.verify_password
-def verify_password(username_or_token, password):
-    # first try to authenticate by token
-    user = User.verify_auth_token(username_or_token)
-    if not user:
-        # try to authenticate with username/password
-        user = User.query.filter_by(username = username_or_token).first()
-        if not user or not user.verify_password(password):
-            return False
-    g.user = user
-    return True
 
 
 class Bucketlist(db.Model):

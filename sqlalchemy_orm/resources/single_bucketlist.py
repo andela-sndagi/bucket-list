@@ -1,7 +1,8 @@
 import datetime
 
 from flask_restful import Resource, fields, marshal_with, reqparse
-from sqlalchemy_orm.models import Bucketlist, db, auth
+from sqlalchemy_orm.models import Bucketlist
+from sqlalchemy_orm.app import db, auth
 from bucketlist_items import bucketlist_items_fields
 
 

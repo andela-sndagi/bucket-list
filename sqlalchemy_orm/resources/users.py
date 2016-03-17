@@ -1,7 +1,8 @@
 from flask import jsonify, g, abort
 from flask_restful import Resource, reqparse
 
-from sqlalchemy_orm.models import User, db, auth
+from models import User
+from app import db, auth
 
 
 class Register(Resource):
