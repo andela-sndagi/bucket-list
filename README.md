@@ -48,17 +48,29 @@ Implement the API in this structure:
 Implement Token Based Authentication
 
 | EndPoint      |   Public Access   |
+
 |::---- |:----: |
+
 | POST /auth/login  |  TRUE     |
+
 | POST /auth/register   |  TRUE     |
+
 | POST /bucketlists/    |  FALSE    |
+
 | GET /bucketlists/     |  FALSE    |
+
 | GET /bucketlists/< id >   |   FALSE   |
+
 | PUT /bucketlists/< id >   |   FALSE   |
+
 | DELETE /bucketlists/< id >    |   FALSE   |
+
 | POST /bucketlists/< id >/items/   |   FALSE   |
+
 | PUT /bucketlists/< id >/items/< item_id >     |   FALSE   |
+
 | DELETE /bucketlists/< id >/items/< item_id >      |   FALSE   |
+
 The responses all belong to the logged in user
 
 ##Task 2
