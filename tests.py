@@ -8,15 +8,25 @@ parentdir = os.path.dirname(currentdir)
 sys.path.insert(0, parentdir)
 
 import unittest
+from flask.ext.fixtures import FixturesMixin
 from bucketlist.app import app
+from bucketlist.models import Bucketlist, BucketlistItem, db
 
 # Configure the app with the testing configuration
 app.config.from_object('bucketlist.config.TestConfig')
 
-class AppTestCase(unittest.TestCase):
+# Initialize the Flask-Fixtures mixin class
+FixturesMixin.init_app(app, db)
+
+
+class AppTestCase(unittest.TestCase, FixturesMixin):
     """
     AppTestCase
+    Make sure to inherit from the FixturesMixin class
     """
+
+    # Specify the fixtures file(s) you want to load
+    fixtures = ['bucketlists.json']
 
     def setUp(self):
         """Setting up the environment for testing"""
@@ -33,3 +43,17 @@ class AppTestCase(unittest.TestCase):
         print '=> Getting to "/"'
         assert response.status == "200 OK"
         self.assertIn('Bucket List Service API is ready', response.data)
+
+    def test_bucketlists_in_fixtures(self):
+        """Test bucketlist entries in fixtures"""
+        bucketlists = Bucketlist.query.all()
+        self.assertEqual(len(bucketlists) == Bucketlist.query.count(), 1)
+        self.assertEqual(len(bucketlists[0].items), 1)
+
+    def test_bucketlist_items_in_fixtures(self):
+        """Test bucketlistitems entries in fixtures"""
+        items = BucketlistItem.query.all()
+        self.assertEqual(len(items) == Bucketlist.query.count(), 1)
+        bl1 = Bucketlist.query.filter(Bucketlist.name == 'BucketList1').first()
+        for item in items:
+            assert item.bucketlist_id == bl1
