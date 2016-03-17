@@ -13,6 +13,7 @@ from flask_restful import Api
 
 # Resources
 from resources import Index
+from resources.bucketlists import Bucketlists
 
 # Initialise Flask
 app = Flask(__name__)
@@ -25,3 +26,4 @@ api = Api(app)
 
 # URLs
 api.add_resource(Index, '/')
+api.add_resource(Bucketlists, '/bucketlists/')
