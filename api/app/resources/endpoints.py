@@ -106,10 +106,10 @@ class Bucketlists(Resource):
         current_user = models.User.verify_auth_token(get_request_token(), db)
 
         result = db.query(models.BucketList).filter_by(created_by=current_user.username).order_by(desc(models.BucketList.date_created))
-            paginator = Paginator(result, Limit.limit)
-            # return the first page of the results by default
-            paged_response = paging(self.bucketlist_fields, paginator, page)
-            return paged_response
+        paginator = Paginator(result, Limit.limit)
+        # return the first page of the results by default
+        paged_response = paging(self.bucketlist_fields, paginator, page)
+        return paged_response
 
     @auth.login_required
     def post(self):
