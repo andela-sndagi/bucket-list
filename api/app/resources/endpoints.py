@@ -105,12 +105,23 @@ class Bucketlists(Resource):
 
         current_user = User.verify_auth_token(request.headers.get('token'), db)
 
-        result = db.query(Bucketlist).filter_by(created_by=current_user.username)
-        paginator = Paginator(result, Limit.limit)
+        # the "search bucketlist by name" parameter
+        q = request.args.get('q')
+        if q:
+            result = db.query(Bucketlist).filter_by(name=q, created_by=current_user.username)
+            if result:
+                paginator = Paginator(result, Limit.limit)
+                paged_response = paging(self.bucketlist_fields, paginator, page)
+                return paged_response
+            return {'message': "Bucketlist with name " + q + " doesn't exist"}, 404
+        else:
+            # when no parameter has been specified
+            result = db.query(Bucketlist).filter_by(created_by=current_user.username)
+            paginator = Paginator(result, Limit.limit)
 
-        # return the first page of the results by default
-        paged_response = paging(self.bucketlist_fields, paginator, page)
-        return paged_response
+            # return the first page of the results by default
+            paged_response = paging(self.bucketlist_fields, paginator, page)
+            return paged_response
 
     @auth.login_required
     def post(self):
