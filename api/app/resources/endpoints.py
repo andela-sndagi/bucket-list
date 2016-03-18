@@ -103,7 +103,7 @@ class Bucketlists(Resource):
             else:
                 Limit.limit = limit
 
-        current_user = models.User.verify_auth_token(get_request_token(), db)
+        current_user = models.User.verify_auth_token(request.headers.get('token'), db)
 
         result = db.query(models.BucketList).filter_by(created_by=current_user.username).order_by(desc(models.BucketList.date_created))
         paginator = Paginator(result, Limit.limit)
