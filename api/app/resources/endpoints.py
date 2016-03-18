@@ -103,10 +103,11 @@ class Bucketlists(Resource):
             else:
                 Limit.limit = limit
 
-        current_user = models.User.verify_auth_token(request.headers.get('token'), db)
+        current_user = User.verify_auth_token(request.headers.get('token'), db)
 
-        result = db.query(models.BucketList).filter_by(created_by=current_user.username).order_by(desc(models.BucketList.date_created))
+        result = db.query(Bucketlist).filter_by(created_by=current_user.username)
         paginator = Paginator(result, Limit.limit)
+
         # return the first page of the results by default
         paged_response = paging(self.bucketlist_fields, paginator, page)
         return paged_response
