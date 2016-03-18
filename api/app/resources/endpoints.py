@@ -1,9 +1,27 @@
 import datetime
 
+from flask import g
 from flask_restful import Resource, fields, marshal_with, reqparse
 
-from ..models import db, Bucketlist, BucketlistItem
+from ..models import db, Bucketlist, BucketlistItem, User
 from bucketlist_items import bucketlist_items_fields
+
+from flask.ext.httpauth import HTTPBasicAuth
+auth = HTTPBasicAuth()
+
+@auth.login_required
+
+@auth.verify_password
+def verify_password(username_or_token, password):
+    # first try to authenticate by token
+    user = User.verify_auth_token(username_or_token)
+    if not user:
+        # try to authenticate with username/password
+        user = User.query.filter_by(username = username_or_token).first()
+        if not user or not user.verify_password(password):
+            return False
+    g.user = user
+    return True
 
 
 bucketlist_items_fields = {
@@ -40,7 +58,7 @@ class Bucketlists(Resource):
                                  location='json')
         super(Bucketlists, self).__init__()
 
-    # @auth.login_required
+    @auth.login_required
     @marshal_with(bucketlist_fields)
     def get(self):
         """GET endpoint"""
@@ -50,7 +68,7 @@ class Bucketlists(Resource):
             bucketlists.append(bucketlist)
         return bucketlists
 
-    # @auth.login_required
+    @auth.login_required
     def post(self):
         """POST endpoint"""
         args = self.parser.parse_args()
@@ -76,14 +94,14 @@ class SingleBucketlist(Resource):
                                  location='json')
         super(SingleBucketlist, self).__init__()
 
-    # @auth.login_required
+    @auth.login_required
     @marshal_with(bucketlist_fields)
     def get(self, id):
         """GET endpoint"""
         bucketlist = Bucketlist.query.filter_by(id=id).first()
         return bucketlist
 
-    # @auth.login_required
+    @auth.login_required
     def put(self, id):
         """PUT endpoint"""
         args = self.parser.parse_args()
@@ -96,7 +114,7 @@ class SingleBucketlist(Resource):
         return {'message': "Bucketlist #{} Successfully updated".format(
             bucket_list.id)}, 200
 
-    # @auth.login_required
+    @auth.login_required
     def delete(self, id):
         """DELETE endpoint"""
         bucket_list = Bucketlist.query.filter_by(id=id).one()
@@ -121,7 +139,7 @@ class BucketlistItems(Resource):
                                  help='Enter item title', location='json')
         super(BucketlistItems, self).__init__()
 
-    # @auth.login_required
+    @auth.login_required
     def post(self, id):
         """post on the url"""
         args = self.parser.parse_args()
@@ -149,7 +167,7 @@ class SingleBucketlistItem(Resource):
                                  location='json')
         super(SingleBucketlistItem, self).__init__()
 
-    # @auth.login_required
+    @auth.login_required
     def put(self, id, item_id):
         """PUT endpoint"""
 
@@ -167,7 +185,7 @@ class SingleBucketlistItem(Resource):
         return {"message": "BucketlistItem {0} Successfully updated".
                 format(bucket_list_item.id)}, 200
 
-    # @auth.login_required
+    @auth.login_required
     def delete(self, id, item_id):
         """DELETE endpoint"""
 

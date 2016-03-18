@@ -1,20 +1,14 @@
 # sqlalchemy_orm/tests.py
 
-# import os, sys
-# import inspect
-# currentdir = os.path.dirname(os.path.abspath(
-#     inspect.getfile(inspect.currentframe())))
-# parentdir = os.path.dirname(currentdir)
-# sys.path.insert(0, parentdir)
 
 import unittest
 from flask.ext.fixtures import FixturesMixin
-from .. import config
+# from .. import config
 # from ..app import app, db
 from ..app.models import Bucketlist, BucketlistItem, initialise, drop, db, app
 
 # Configure the app with the testing configuration
-# app.config.from_object('config.TestConfig')
+# app.config.update(SQLALCHEMY_DATABASE_URI: 'sqlite://')
 
 # Initialize the Flask-Fixtures mixin class
 FixturesMixin.init_app(app, db)
@@ -65,7 +59,8 @@ class AppTestCase(unittest.TestCase, FixturesMixin):
     def test_get_bucketlists_route(self):
         """Test that GET in /bucketlists/ route is working"""
         response = self.app.get('/bucketlists/')
-        self.assertEqual(response.status_code, 200)
+        # self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 401)
 
     def test_post_bucketlists_route(self):
         """Test that POST in /bucketlists/ route is working"""
@@ -73,8 +68,10 @@ class AppTestCase(unittest.TestCase, FixturesMixin):
 
         response = self.app.post('/bucketlists/', data=bucketlist)
         bucketlists = Bucketlist.query.all()
-        self.assertEqual(response.status_code, 201)
-        self.assertEqual(len(bucketlists), 2)
+        # self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.status_code, 401)
+        self.assertEqual(len(bucketlists), 1)
+        # self.assertEqual(len(bucketlists), 2)
 
 
     def test_get_specific_bucketlist_route(self):
@@ -82,11 +79,12 @@ class AppTestCase(unittest.TestCase, FixturesMixin):
         bucketlist = {"name": "Travel", "created_by": "Stan"}
 
         response = self.app.get('/bucketlists/1')
-        self.assertEqual(response.status_code, 200)
+        # self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 401)
         response = self.app.post('/bucketlists/', data=bucketlist)
         response = self.app.get('/bucketlists/2')
-        # self.assertEqual(response.data['name'], 'Travel')
-        self.assertEqual(response.status_code, 200)
+        # self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 401)
 
     def test_put_specific_bucketlist_route(self):
         """Test that POST in /bucketlists/<> route is working"""
@@ -94,19 +92,22 @@ class AppTestCase(unittest.TestCase, FixturesMixin):
         bucketlist = {"name": "New Bucketlist", "created_by": "Stan"}
 
         response = self.app.put('/bucketlists/1', data=bucketlist)
-        self.assertEqual(response.status_code, 200)
+        # self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 401)
         bucketlists = Bucketlist.query.all()
         self.assertEqual(len(bucketlists), 1)
         response = self.app.get('/bucketlists/1')
-        self.assertEqual(response.status_code, 200)
-        # self.assertEqual(response.data['name'], 'New Bucketlist')
+        self.assertEqual(response.status_code, 401)
+        # self.assertEqual(response.status_code, 200)
 
     def test_delete_specific_bucketlist_route(self):
         """Test that POST in /bucketlists/<> route is working"""
         response = self.app.delete('/bucketlists/1')
         bucketlists = Bucketlist.query.all()
-        self.assertEqual(response.status_code, 204)
-        self.assertEqual(len(bucketlists), 0)
+        self.assertEqual(response.status_code, 401)
+        # self.assertEqual(response.status_code, 204)
+        self.assertEqual(len(bucketlists), 1)
+        # self.assertEqual(len(bucketlists), 0)
 
     def test_post_bucketlistitems_route(self):
         """Test that POST in /bucketlists/<>/items/ route is working"""
@@ -114,8 +115,10 @@ class AppTestCase(unittest.TestCase, FixturesMixin):
 
         response = self.app.post('/bucketlists/1/items/', data=bucketlist_item)
         bucketlists = Bucketlist.query.all()
-        self.assertEqual(response.status_code, 201)
-        self.assertEqual(len(bucketlists[0].items), 2)
+        # self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.status_code, 401)
+        self.assertEqual(len(bucketlists[0].items), 1)
+        # self.assertEqual(len(bucketlists[0].items), 2)
 
     def test_put_specific_bucketlistitem_route(self):
         """Test that PUT in /bucketlists/<>/items/<> route is working"""
@@ -124,12 +127,15 @@ class AppTestCase(unittest.TestCase, FixturesMixin):
 
         response = self.app.put('/bucketlists/1/items/1', data=bucketlist_item)
         bucketlists = Bucketlist.query.all()
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 401)
+        # self.assertEqual(response.status_code, 200)
         self.assertEqual(len(bucketlists[0].items), 1)
 
     def test_delete_specific_bucketlistitem_route(self):
         """Test that DELETE in /bucketlists/<>/items/<> route is working"""
         response = self.app.delete('/bucketlists/1/items/1')
         bucketlists = Bucketlist.query.all()
-        self.assertEqual(response.status_code, 204)
-        self.assertEqual(len(bucketlists[0].items), 0)
+        # self.assertEqual(response.status_code, 204)
+        self.assertEqual(response.status_code, 401)
+        self.assertEqual(len(bucketlists[0].items), 1)
+        # self.assertEqual(len(bucketlists[0].items), 0)
