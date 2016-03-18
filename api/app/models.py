@@ -1,14 +1,13 @@
 # bucketlist/models.py
 
-import os, sys
-import inspect
-currentdir = os.path.dirname(os.path.abspath(
-    inspect.getfile(inspect.currentframe())))
-parentdir = os.path.dirname(currentdir)
-sys.path.insert(0, parentdir)
 
-from . import db
+from flask import Flask
+from flask.ext.sqlalchemy import SQLAlchemy
 
+# Initialise Flask
+app = Flask(__name__)
+
+db = SQLAlchemy(app)
 
 class Bucketlist(db.Model):
     """Model for Bucketlist"""
