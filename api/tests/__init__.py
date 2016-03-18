@@ -9,7 +9,7 @@
 
 import unittest
 from flask.ext.fixtures import FixturesMixin
-from api import config
+from .. import config
 from ..app import app, db
 from ..app.models import Bucketlist, BucketlistItem, initialise, drop
 
