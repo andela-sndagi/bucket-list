@@ -1,12 +1,16 @@
 import datetime
 
 from flask import g, request
-from flask_restful import Resource, fields, marshal_with, reqparse
+from flask.ext.httpauth import HTTPBasicAuth
+
+from flask_restful import Resource, fields, marshal_with, reqparse, marshal
+
+from sqlalchemy_paginator import Paginator
+from sqlalchemy_paginator.exceptions import EmptyPage
 
 from ..models import db, Bucketlist, BucketlistItem, User
 from bucketlist_items import bucketlist_items_fields
 
-from flask.ext.httpauth import HTTPBasicAuth
 auth = HTTPBasicAuth()
 
 
@@ -21,6 +25,24 @@ def verify_password(username_or_token, password):
         return False
     g.user = user
     return True
+
+
+class Limit(object):
+    """
+    This class's attribute helps maintains the limit (content per page limit)
+    across separate client page requests.
+    """
+    limit = 20
+
+def paging(fields, paginator, page):
+    """
+    This method receives field, paginator and page arguments. It uses paginator and page arguments
+    to paginate sqlalchemy query sets. The fields argument is used by marshal to return serialized results.
+    """
+    try:
+        return marshal(paginator.page(page).object_list, fields), 200
+    except EmptyPage:
+        return {'message': "Page doesn't exist"}, 404
 
 
 bucketlist_items_fields = {
@@ -59,13 +81,35 @@ class Bucketlists(Resource):
 
     @auth.login_required
     @marshal_with(bucketlist_fields)
-    def get(self):
+    def get(self, page=1):
         """GET endpoint"""
         bucketlists = []
-        # Bucketlist.query.all() returns a query that has to be iterated through
-        for bucketlist in Bucketlist.query.all():
-            bucketlists.append(bucketlist)
-        return bucketlists
+
+        try:
+            # Get the limit specified by the client
+            limit = int(request.args.get('limit', 0))
+        except ValueError:
+            # If limit specified by client isn't number type, ignore
+            # that and default to 20
+            limit = 20
+
+        if limit:
+            # if limit is greater than maximum, default to 100
+            if limit > 100:
+                Limit.limit = 100
+            elif limit < 1:
+            # if limit is <= 0, default to 20
+                Limit.limit = 20
+            else:
+                Limit.limit = limit
+
+        current_user = models.User.verify_auth_token(get_request_token(), db)
+
+        result = db.query(models.BucketList).filter_by(created_by=current_user.username).order_by(desc(models.BucketList.date_created))
+            paginator = Paginator(result, Limit.limit)
+            # return the first page of the results by default
+            paged_response = paging(self.bucketlist_fields, paginator, page)
+            return paged_response
 
     @auth.login_required
     def post(self):
