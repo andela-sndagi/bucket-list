@@ -1,6 +1,6 @@
 import datetime
 
-from flask import g
+from flask import g, request
 from flask_restful import Resource, fields, marshal_with, reqparse
 
 from ..models import db, Bucketlist, BucketlistItem, User
@@ -9,17 +9,16 @@ from bucketlist_items import bucketlist_items_fields
 from flask.ext.httpauth import HTTPBasicAuth
 auth = HTTPBasicAuth()
 
-@auth.login_required
 
 @auth.verify_password
 def verify_password(username_or_token, password):
-    # first try to authenticate by token
-    user = User.verify_auth_token(username_or_token)
+    # get the token from the header
+    token = request.headers.get('token')
+
+    # Authenticate by token
+    user = User.verify_auth_token(token)
     if not user:
-        # try to authenticate with username/password
-        user = User.query.filter_by(username = username_or_token).first()
-        if not user or not user.verify_password(password):
-            return False
+        return False
     g.user = user
     return True
 
