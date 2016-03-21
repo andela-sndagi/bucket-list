@@ -23,6 +23,7 @@ class User(db.Model):
     password = db.Column(db.String(128))
 
     def hash_password(self, password):
+        """Hash the password to be saved in db"""
         return pwd_context.encrypt(password)
 
     def verify_password(self, password):
@@ -50,7 +51,7 @@ class User(db.Model):
         self.password = self.hash_password(password)
 
     def __repr__(self):
-        return '<User %r>' % self.username
+        return '<User {0}>'.format(self.username)
 
 
 class Bucketlist(db.Model):
@@ -69,7 +70,7 @@ class Bucketlist(db.Model):
         self.created_by = created_by
 
     def __repr__(self):
-        return '<Bucketlist %r>' % self.name
+        return '<Bucketlist {}>'.format(self.name)
 
 
 class BucketlistItem(db.Model):
@@ -90,7 +91,7 @@ class BucketlistItem(db.Model):
         self.bucketlist = bucketlist
 
     def __repr__(self):
-        return '<Item %r>' % self.title
+        return '<Item {}>'.format(self.title)
 
 
 def initialise():
@@ -100,11 +101,6 @@ def initialise():
 def drop():
     """Delete db and its conten"""
     db.drop_all()
-
-from flask.ext.httpauth import HTTPBasicAuth
-auth = HTTPBasicAuth()
-
-@auth.login_required
 
 @auth.verify_password
 def verify_password(username_or_token, password):

@@ -12,7 +12,7 @@ auth = HTTPBasicAuth()
 
 
 @auth.verify_password
-def verify_password(username_or_token, password):
+def verify_password(token, password):
     # get the token from the header
     token = request.headers.get('token')
 
