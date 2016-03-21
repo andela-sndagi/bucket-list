@@ -2,14 +2,11 @@ import datetime
 
 from flask import g, request
 from flask.ext.httpauth import HTTPBasicAuth
+from flask.ext.paginate import Pagination
 
 from flask_restful import Resource, fields, marshal_with, reqparse, marshal
 
-from sqlalchemy_paginator import Paginator
-from sqlalchemy_paginator.exceptions import EmptyPage
-
 from ..models import db, Bucketlist, BucketlistItem, User
-from bucketlist_items import bucketlist_items_fields
 
 auth = HTTPBasicAuth()
 
@@ -25,25 +22,6 @@ def verify_password(username_or_token, password):
         return False
     g.user = user
     return True
-
-
-class Limit(object):
-    """
-    This class's attribute helps maintains the limit (content per page limit)
-    across separate client page requests.
-    """
-    limit = 20
-
-def paging(fields, paginator, page):
-    """
-    This method receives field, paginator and page arguments. It uses paginator and page arguments
-    to paginate sqlalchemy query sets. The fields argument is used by marshal to return serialized results.
-    """
-    try:
-        return marshal(paginator.page(page).object_list, fields), 200
-    except EmptyPage:
-        return {'message': "Page doesn't exist"}, 404
-
 
 bucketlist_items_fields = {
     'id': fields.Integer,
@@ -63,6 +41,12 @@ bucketlist_fields = {
     'date_modified': fields.String,
 }
 
+class Limit(object):
+    """
+    This class's attribute helps maintains the limit (content per page limit)
+    across separate client page requests.
+    """
+    limit = 20
 
 class Bucketlists(Resource):
     """
@@ -80,7 +64,6 @@ class Bucketlists(Resource):
         super(Bucketlists, self).__init__()
 
     @auth.login_required
-    @marshal_with(bucketlist_fields)
     def get(self, page=1):
         """GET endpoint"""
         bucketlists = []
@@ -103,25 +86,38 @@ class Bucketlists(Resource):
             else:
                 Limit.limit = limit
 
-        current_user = User.verify_auth_token(request.headers.get('token'), db)
+        current_user = User.verify_auth_token(request.headers.get('token'))
 
         # the "search bucketlist by name" parameter
-        q = request.args.get('q')
-        if q:
-            result = db.query(Bucketlist).filter_by(name=q, created_by=current_user.username)
-            if result:
-                paginator = Paginator(result, Limit.limit)
-                paged_response = paging(self.bucketlist_fields, paginator, page)
-                return paged_response
-            return {'message': "Bucketlist with name " + q + " doesn't exist"}, 404
-        else:
-            # when no parameter has been specified
-            result = db.query(Bucketlist).filter_by(created_by=current_user.username)
-            paginator = Paginator(result, Limit.limit)
+        search = False
+        qs = request.args.get('q')
+        if qs:
+            search = True
+        try:
+            page = int(request.args.get('page', 1))
+        except ValueError:
+            page = 1
 
-            # return the first page of the results by default
-            paged_response = paging(self.bucketlist_fields, paginator, page)
-            return paged_response
+        if search:
+            query = Bucketlist.query.filter_by(
+                name=qs)
+            if query.count() == 0:
+                return {"message": "No search results"}
+            else:
+                info = {"message": "Search results"}
+                return [info, marshal(query.first(), bucketlist_fields)]
+
+        bucketlists = Bucketlist.query.all()
+        pagination = Pagination(per_page=Limit.limit, page=page,
+                                total=len(bucketlists), search=search,
+                                record_name='bucketlists')
+        info = {"Pagination Details": {
+            "results": pagination.endpoint,
+            "per_page": pagination.per_page,
+            "page": pagination.page,
+            "total": pagination.total}}
+        return [info, marshal(bucketlists, bucketlist_fields)]
+
 
     @auth.login_required
     def post(self):
