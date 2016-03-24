@@ -1,6 +1,3 @@
-# bucketlist/models.py
-
-
 from flask import Flask, g
 from flask.ext.sqlalchemy import SQLAlchemy
 
@@ -36,6 +33,8 @@ class User(db.Model):
     @staticmethod
     def verify_auth_token(token):
         s = Serializer(app.config['SECRET_KEY'])
+        if token == None:
+            return {}
         try:
             data = s.loads(token)
         except SignatureExpired:
@@ -51,7 +50,7 @@ class User(db.Model):
         self.password = self.hash_password(password)
 
     def __repr__(self):
-        return '<User {0}>'.format(self.username)
+        return self.username
 
 
 class Bucketlist(db.Model):
@@ -62,7 +61,11 @@ class Bucketlist(db.Model):
                              default=db.func.current_timestamp())
     date_modified = db.Column(db.DateTime,
                               default=db.func.current_timestamp())
-    created_by = db.Column(db.String(20))
+    created_by = db.Column(db.Integer, db.ForeignKey('user.id'))
+    user_id = db.relationship('User', backref='bucketlist')
+    # created_by = db.relationship('User', backref='bucketlists')
+    # bucketlist = db.Column(db.Integer, db.ForeignKey('user.id'))
+
 
     #  Constructor for Bucketlist
     def __init__(self, name, created_by):

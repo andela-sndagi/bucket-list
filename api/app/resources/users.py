@@ -2,7 +2,6 @@ from flask import jsonify, g, abort
 from flask_restful import Resource, reqparse
 
 from ..models import User, db
-# from app import db, auth
 
 
 class Register(Resource):
@@ -30,17 +29,20 @@ class Register(Resource):
         password = args['password']
         conf_password = args['conf_password']
 
-        if username is None or password is None:
-            abort(400) # missing arguments
+        if username is None or password is None or conf_password is None:
+            return {'message':
+                    'Please enter username and/'
+                    '' + 'or password and/ or conf_password'}, 404
         if User.query.filter_by(username=username).first() is not None:
-            abort(400)
+            return {'message': 'There is a user with that username'}, 404
         if password == conf_password:
             new_user = User(username=username, password=password)
             username = new_user.username
             db.session.add(new_user)
             db.session.commit()
-            return {'message': "User '{}' successfully registered".format(username)}, 201
-        return {"message": "Passwords don't match"}, 404
+            return {'message':
+                    "User '{}' successfully registered".format(username)}, 201
+        return {'message': 'Passwords don\'t match'}, 404
 
 class Login(Resource):
     """
@@ -65,7 +67,9 @@ class Login(Resource):
         password = args['password']
 
         user = User.query.filter_by(username=username).first()
+        if user is None:
+            return {'message': 'There\'s no user by that username'}, 404
         if user.verify_password(password):
             token = user.generate_auth_token()
             return jsonify({'token': token.decode('ascii')})
-        return {"message": "Wrong password. Please try again"}, 404
+        return {'message': 'Wrong password. Please try again'}, 404

@@ -1,10 +1,5 @@
-# bucketlist/app.py
-
-
 from flask_restful import Api
 from models import app
-
-# import ipdb; ipdb.set_trace()
 
 # Resources
 from resources import Index

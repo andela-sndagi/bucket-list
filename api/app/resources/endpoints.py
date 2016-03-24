@@ -2,6 +2,7 @@ import datetime
 
 from flask import g, request
 from flask.ext.httpauth import HTTPBasicAuth
+# from flask.ext.login import login_required, LoginManager
 from flask.ext.paginate import Pagination
 
 from flask_restful import Resource, fields, marshal_with, reqparse, marshal
@@ -23,10 +24,11 @@ def verify_password(token, password):
     g.user = user
     return True
 
+
+
 bucketlist_items_fields = {
     'id': fields.Integer,
     'title': fields.String,
-    'bucketlist': fields.Integer,
     'date_created': fields.String,
     'date_modified': fields.String,
     'done': fields.Boolean,
@@ -66,27 +68,20 @@ class Bucketlists(Resource):
     @auth.login_required
     def get(self, page=1):
         """GET endpoint"""
-        bucketlists = []
-
         try:
             # Get the limit specified by the client
             limit = int(request.args.get('limit', 0))
-        except ValueError:
-            # If limit specified by client isn't number type, ignore
-            # that and default to 20
-            limit = 20
-
-        if limit:
-            # if limit is greater than maximum, default to 100
             if limit > 100:
                 Limit.limit = 100
             elif limit < 1:
-            # if limit is <= 0, default to 20
+                # if limit is <= 0, default to 20
                 Limit.limit = 20
             else:
                 Limit.limit = limit
-
-        current_user = User.verify_auth_token(request.headers.get('token'))
+        except ValueError:
+            # If limit specified by client isn't number type, ignore
+            # that and default to 20
+            Limit.limit = 20
 
         # the "search bucketlist by name" parameter
         search = False
@@ -99,33 +94,28 @@ class Bucketlists(Resource):
             page = 1
 
         if search:
-            query = Bucketlist.query.filter_by(
-                name=qs)
+            query = Bucketlist.query.filter(Bucketlist.created_by == str(g.user.id), Bucketlist.name == qs)
             if query.count() == 0:
-                return {"message": "No search results"}
+                return {'message': 'No search results'}, 404
             else:
-                info = {"message": "Search results"}
-                return [info, marshal(query.first(), bucketlist_fields)]
+                return marshal(query.first(), bucketlist_fields)
 
-        bucketlists = Bucketlist.query.all()
-        pagination = Pagination(per_page=Limit.limit, page=page,
-                                total=len(bucketlists), search=search,
-                                record_name='bucketlists')
-        info = {"Pagination Details": {
-            "results": pagination.endpoint,
-            "per_page": pagination.per_page,
-            "page": pagination.page,
-            "total": pagination.total}}
-        return [info, marshal(bucketlists, bucketlist_fields)]
-
+        all_bucketlists = Bucketlist.query.filter(Bucketlist.created_by == str(g.user.id)).all()
+        bucketlists = Bucketlist.query.filter(Bucketlist.created_by == str(g.user.id)).paginate(page, Limit.limit, False).items
+        if len(all_bucketlists) == 0:
+            return {'error': 'Nothing here for you :-)'}, 404
+        return {'page': page, 'numberPerPage': Limit.limit,
+                'total': len(all_bucketlists),
+                'bucketlists': marshal(bucketlists, bucketlist_fields)}
 
     @auth.login_required
     def post(self):
         """POST endpoint"""
         args = self.parser.parse_args()
         name = args['name']
-        created_by = args['created_by']
-        new_bucket_list = Bucketlist(name=name, created_by=created_by)
+        if not name:
+            return {'message': 'Enter the name of the Bucketlist'}, 404
+        new_bucket_list = Bucketlist(name=name, created_by=g.user.id)
         name = new_bucket_list.name
         db.session.add(new_bucket_list)
         db.session.commit()
@@ -146,29 +136,36 @@ class SingleBucketlist(Resource):
         super(SingleBucketlist, self).__init__()
 
     @auth.login_required
-    @marshal_with(bucketlist_fields)
     def get(self, id):
         """GET endpoint"""
-        bucketlist = Bucketlist.query.filter_by(id=id).first()
-        return bucketlist
+        bucketlist = Bucketlist.query.filter(Bucketlist.created_by == str(g.user.id), Bucketlist.id==id).first()
+        if bucketlist == None:
+            return {'error': 'No bucketlist by that id belonging to you'}, 404
+        return marshal(bucketlist, bucketlist_fields)
 
     @auth.login_required
     def put(self, id):
         """PUT endpoint"""
         args = self.parser.parse_args()
         name = args['name']
-        bucket_list = Bucketlist.query.filter_by(id=id).first()
-        bucket_list.name = name
-        bucket_list.date_modified = datetime.datetime.now(
+        bucketlist = Bucketlist.query.filter(Bucketlist.created_by == str(g.user.id), Bucketlist.id==id).first()
+        if bucketlist == None:
+            return {'error':
+                    'You cannot update bucketlist by that id and/ or it\'s not there'}, 404
+        bucketlist.name = name
+        bucketlist.date_modified = datetime.datetime.now(
             ).replace(microsecond=0)
         db.session.commit()
         return {'message': "Bucketlist #{} Successfully updated".format(
-            bucket_list.id)}, 200
+            bucketlist.id)}, 200
 
     @auth.login_required
     def delete(self, id):
         """DELETE endpoint"""
-        bucket_list = Bucketlist.query.filter_by(id=id).one()
+        bucketlist = Bucketlist.query.filter(Bucketlist.created_by == str(g.user.id), Bucketlist.id==id).first()
+        if bucketlist == None:
+            return {'error':
+                    'You cannot delete bucketlist by that id and/ or it\'s not there'}, 404
         db.session.delete(bucket_list)
         db.session.commit()
         # print to console
@@ -193,6 +190,9 @@ class BucketlistItems(Resource):
     @auth.login_required
     def post(self, id):
         """post on the url"""
+        bucketlist = Bucketlist.query.filter(Bucketlist.created_by == str(g.user.id), Bucketlist.id==id).first()
+        if bucketlist == None:
+            return {'error': 'Not permitted'}, 404
         args = self.parser.parse_args()
         title = args['title']
         new_bucket_list_item = BucketlistItem(title=title, bucketlist=id)
@@ -221,10 +221,13 @@ class SingleBucketlistItem(Resource):
     @auth.login_required
     def put(self, id, item_id):
         """PUT endpoint"""
-
-        bucket_list_item = BucketlistItem.query.filter_by(
-            bucketlist=id).all()[item_id-1]
-
+        bucketlist = Bucketlist.query.filter(Bucketlist.created_by == str(g.user.id), Bucketlist.id==id).first()
+        if bucketlist == None:
+            return {'error': 'Not permitted'}, 404
+        bucketlist_item = BucketlistItem.query.filter(BucketlistItem.bucketlist==id).all()
+        if len(bucketlist_item) == 0:
+            return {'error': 'No item by that id'}, 404
+        bucket_list_item = bucketlist_item[item_id-1]
         args = self.parser.parse_args()
         title = args['title']
         done = args['done']
@@ -240,8 +243,14 @@ class SingleBucketlistItem(Resource):
     def delete(self, id, item_id):
         """DELETE endpoint"""
 
-        bucket_list_item = BucketlistItem.query.filter_by(
-            bucketlist=id).all()[item_id-1]
+        bucketlist = Bucketlist.query.filter(Bucketlist.created_by == str(g.user.id), Bucketlist.id==id).first()
+        if bucketlist == None:
+            return {'error': 'Not permitted'}, 404
+
+        bucketlist_item = BucketlistItem.query.filter(BucketlistItem.bucketlist == id).all()
+        if len(bucketlist_item) == 0:
+            return {'error': 'No item by that id'}, 404
+        bucket_list_item = bucketlist_item[item_id-1]
 
         db.session.delete(bucket_list_item)
         db.session.commit()
