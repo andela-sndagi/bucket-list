@@ -33,7 +33,7 @@ class AppTestCase(unittest.TestCase, FixturesMixin):
         """Test if the index page is working"""
         response = self.app.get('/')
         print '=> Getting to "/"'
-        assert response.status == "200 OK"
+        self.assertEqual(response.status_code, 200)
         self.assertIn('Bucket List Service API is ready', response.data)
 
     def test_users_items_in_fixtures(self):

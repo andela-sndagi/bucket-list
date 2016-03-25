@@ -1,4 +1,3 @@
-from flask import jsonify, g, abort
 from flask_restful import Resource, reqparse
 
 from ..models import User, db

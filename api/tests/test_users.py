@@ -1,8 +1,7 @@
 import json
-
 import unittest
 
-from ..app.models import User, initialise, drop, app
+from ..app.models import User, initialise, drop, app, db
 
 
 class AppTestCase(unittest.TestCase):
@@ -25,44 +24,43 @@ class AppTestCase(unittest.TestCase):
         """Test POST in /auth/register/ route"""
 
         data = json.dumps({
-            'username': 'username',
+            'username': 'user',
             'password': 'p@ssw0rd'
         })
         response = self.app.post('/auth/register/', data=data, content_type='application/json')
         self.assertEqual(response.status_code, 404)
         data = json.dumps({
-            'username': 'username',
+            'username': 'user',
             'password': 'p@ssw0rd',
             'conf_password': 'password'
         })
         response = self.app.post('/auth/register/', data=data, content_type='application/json')
         self.assertEqual(response.status_code, 404)
         data = json.dumps({
-            'username': 'username',
+            'username': 'user',
             'password': 'p@ssw0rd',
             'conf_password': 'p@ssw0rd'
         })
         response = self.app.post('/auth/register/', data=data, content_type='application/json')
         self.assertEqual(response.status_code, 201)
+        self.assertNotEqual(User.query.all(), None)
 
+    def test_post_login_route(self):
+        """Test POST in /auth/login/ route"""
 
-    # def test_post_login_route(self):
-    #     """Test POST in /auth/login/ route"""
+        data = json.dumps({
+            'username': 'user',
+            'password': 'p@ssw0rd'
+        })
+        response = self.app.post('/auth/login/', data=data, content_type='application/json')
+        self.assertEqual(response.status_code, 404)
 
-    #     """First Register"""
-    #     data = json.dumps({
-    #         'username': 'username',
-    #         'password': 'password',
-    #         'conf_password': 'password'
-    #     })
-    #     response = self.app.post('/auth/register/', data=data, content_type='application/json')
-    #     self.assertEqual(response.status_code, 201)
-
-    #     """Then Login"""
-    #     l_data = json.dumps({
-    #         "username": "username",
-    #         "password": "password"
-    #     })
-    #     import ipdb; ipdb.set_trace()
-    #     response = self.app.post('/auth/login/', data=l_data, content_type='application/json')
-    #     self.assertEqual(response.status_code, 200)
+        user = User(username='username', password='p@ssw0rd')
+        db.session.add(user)
+        db.session.commit()
+        data = json.dumps({
+            'username': 'username',
+            'password': 'p@ssw0rd'
+        })
+        response = self.app.post('/auth/login/', data=data, content_type='application/json')
+        self.assertEqual(response.status_code, 200)

@@ -16,7 +16,7 @@ def start():
     initialise()
 
 @manager.command
-def exit():
+def stop():
     """Exit application by deleting Database and its contents."""
     if prompt_bool(
     "Bucketlist API is exitting...\n\

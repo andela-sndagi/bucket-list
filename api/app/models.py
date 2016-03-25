@@ -28,19 +28,19 @@ class User(db.Model):
 
     def generate_auth_token(self, expiration = 3600):
         s = Serializer(app.config['SECRET_KEY'], expires_in = expiration)
-        return s.dumps({ 'id': self.id })
+        return s.dumps({'id': self.id})
 
     @staticmethod
     def verify_auth_token(token):
         s = Serializer(app.config['SECRET_KEY'])
-        if token == None:
+        if token is None:
             return {}
         try:
             data = s.loads(token)
         except SignatureExpired:
-            return None # valid token, but expired
+            return None  # valid token, but expired
         except BadSignature:
-            return None # invalid token
+            return None  # invalid token
         user = User.query.get(data['id'])
         return user
 
@@ -63,8 +63,6 @@ class Bucketlist(db.Model):
                               default=db.func.current_timestamp())
     created_by = db.Column(db.Integer, db.ForeignKey('user.id'))
     user_id = db.relationship('User', backref='bucketlist')
-    # created_by = db.relationship('User', backref='bucketlists')
-    # bucketlist = db.Column(db.Integer, db.ForeignKey('user.id'))
 
 
     #  Constructor for Bucketlist
@@ -104,15 +102,3 @@ def initialise():
 def drop():
     """Delete db and its conten"""
     db.drop_all()
-
-@auth.verify_password
-def verify_password(username_or_token, password):
-    # first try to authenticate by token
-    user = User.verify_auth_token(username_or_token)
-    if not user:
-        # try to authenticate with username/password
-        user = User.query.filter_by(username = username_or_token).first()
-        if not user or not user.verify_password(password):
-            return False
-    g.user = user
-    return True

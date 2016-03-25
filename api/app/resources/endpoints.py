@@ -2,10 +2,7 @@ import datetime
 
 from flask import g, request
 from flask.ext.httpauth import HTTPBasicAuth
-# from flask.ext.login import login_required, LoginManager
-from flask.ext.paginate import Pagination
-
-from flask_restful import Resource, fields, marshal_with, reqparse, marshal
+from flask_restful import Resource, fields, reqparse, marshal
 
 from ..models import db, Bucketlist, BucketlistItem, User
 
@@ -102,8 +99,8 @@ class Bucketlists(Resource):
 
         all_bucketlists = Bucketlist.query.filter(Bucketlist.created_by == str(g.user.id)).all()
         bucketlists = Bucketlist.query.filter(Bucketlist.created_by == str(g.user.id)).paginate(page, Limit.limit, False).items
-        if len(all_bucketlists) == 0:
-            return {'error': 'Nothing here for you :-)'}, 404
+        if not all_bucketlists:
+            return {'error': 'You have no bucketlists'}, 404
         return {'page': page, 'numberPerPage': Limit.limit,
                 'total': len(all_bucketlists),
                 'bucketlists': marshal(bucketlists, bucketlist_fields)}
@@ -149,7 +146,7 @@ class SingleBucketlist(Resource):
         args = self.parser.parse_args()
         name = args['name']
         bucketlist = Bucketlist.query.filter(Bucketlist.created_by == str(g.user.id), Bucketlist.id==id).first()
-        if bucketlist == None:
+        if bucketlist is None:
             return {'error':
                     'You cannot update bucketlist by that id and/ or it\'s not there'}, 404
         bucketlist.name = name
@@ -163,14 +160,14 @@ class SingleBucketlist(Resource):
     def delete(self, id):
         """DELETE endpoint"""
         bucketlist = Bucketlist.query.filter(Bucketlist.created_by == str(g.user.id), Bucketlist.id==id).first()
-        if bucketlist == None:
+        if bucketlist is None:
             return {'error':
                     'You cannot delete bucketlist by that id and/ or it\'s not there'}, 404
-        db.session.delete(bucket_list)
+        db.session.delete(bucketlist)
         db.session.commit()
         # print to console
         print "BucketlistItem entitled '{}' Successfully deleted".format(
-            bucket_list.name)
+            bucketlist.name)
         return {}, 204
 
 
@@ -191,7 +188,7 @@ class BucketlistItems(Resource):
     def post(self, id):
         """post on the url"""
         bucketlist = Bucketlist.query.filter(Bucketlist.created_by == str(g.user.id), Bucketlist.id==id).first()
-        if bucketlist == None:
+        if bucketlist is None:
             return {'error': 'Not permitted'}, 404
         args = self.parser.parse_args()
         title = args['title']
@@ -222,10 +219,10 @@ class SingleBucketlistItem(Resource):
     def put(self, id, item_id):
         """PUT endpoint"""
         bucketlist = Bucketlist.query.filter(Bucketlist.created_by == str(g.user.id), Bucketlist.id==id).first()
-        if bucketlist == None:
+        if bucketlist is None:
             return {'error': 'Not permitted'}, 404
         bucketlist_item = BucketlistItem.query.filter(BucketlistItem.bucketlist==id).all()
-        if len(bucketlist_item) == 0:
+        if not bucketlist_item:
             return {'error': 'No item by that id'}, 404
         bucket_list_item = bucketlist_item[item_id-1]
         args = self.parser.parse_args()
@@ -244,11 +241,11 @@ class SingleBucketlistItem(Resource):
         """DELETE endpoint"""
 
         bucketlist = Bucketlist.query.filter(Bucketlist.created_by == str(g.user.id), Bucketlist.id==id).first()
-        if bucketlist == None:
+        if bucketlist is None:
             return {'error': 'Not permitted'}, 404
 
         bucketlist_item = BucketlistItem.query.filter(BucketlistItem.bucketlist == id).all()
-        if len(bucketlist_item) == 0:
+        if not bucketlist_item:
             return {'error': 'No item by that id'}, 404
         bucket_list_item = bucketlist_item[item_id-1]
 
