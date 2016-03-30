@@ -3,7 +3,7 @@
         "model": "api.app.models.User",
         "records": [{
             "username": "User1",
-            "password": "$6$rounds=670945$6rP/IiqeNuFYwN4O$iU5leShnxZ/TkdoNwsMAi1qW47K3Wk9fOSbfSrC27uAV8dnalt60JBrXZmj/lv/G1vl73M5GwX8hiaLt4X3xA."
+            "password": "p@ssw0rd"
         }]
     },
     {

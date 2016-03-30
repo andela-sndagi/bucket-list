@@ -96,9 +96,9 @@ class BucketlistItem(db.Model):
 
 
 def initialise():
-    """Initialize app by creating db and its dpendencies"""
+    """Initialize app by creating db and its dependencies"""
     db.create_all()
 
 def drop():
-    """Delete db and its conten"""
+    """Delete db and its contents"""
     db.drop_all()

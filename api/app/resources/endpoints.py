@@ -1,4 +1,5 @@
 import datetime
+import json
 
 from flask import g, request
 from flask.ext.httpauth import HTTPBasicAuth
@@ -21,8 +22,6 @@ def verify_password(token, password):
     g.user = user
     return True
 
-
-
 bucketlist_items_fields = {
     'id': fields.Integer,
     'title': fields.String,
@@ -30,15 +29,15 @@ bucketlist_items_fields = {
     'date_modified': fields.String,
     'done': fields.Boolean,
 }
-
 bucketlist_fields = {
     'id': fields.Integer,
     'name': fields.String,
     'items': fields.Nested(bucketlist_items_fields),
-    'created_by': fields.String,
+    'created_by': fields.Integer,
     'date_created': fields.String,
     'date_modified': fields.String,
 }
+
 
 class Limit(object):
     """
@@ -46,6 +45,7 @@ class Limit(object):
     across separate client page requests.
     """
     limit = 20
+
 
 class Bucketlists(Resource):
     """
@@ -91,11 +91,16 @@ class Bucketlists(Resource):
             page = 1
 
         if search:
-            query = Bucketlist.query.filter(Bucketlist.created_by == str(g.user.id), Bucketlist.name == qs)
-            if query.count() == 0:
+            queries = Bucketlist.query.filter(Bucketlist.created_by == str(g.user.id))
+            bucketlists = []
+            for query in queries.all():
+                if qs in query.name:
+                    bucketlists.append(query)
+            if len(bucketlists) == 0:
                 return {'message': 'No search results'}, 404
             else:
-                return marshal(query.first(), bucketlist_fields)
+                return marshal([bucketlist for bucketlist in bucketlists], bucketlist_fields)
+            return {'message': 'No search results'}, 404
 
         all_bucketlists = Bucketlist.query.filter(Bucketlist.created_by == str(g.user.id)).all()
         bucketlists = Bucketlist.query.filter(Bucketlist.created_by == str(g.user.id)).paginate(page, Limit.limit, False).items
@@ -110,7 +115,7 @@ class Bucketlists(Resource):
         """POST endpoint"""
         args = self.parser.parse_args()
         name = args['name']
-        if not name:
+        if name is None:
             return {'message': 'Enter the name of the Bucketlist'}, 404
         new_bucket_list = Bucketlist(name=name, created_by=g.user.id)
         name = new_bucket_list.name
@@ -146,15 +151,19 @@ class SingleBucketlist(Resource):
         args = self.parser.parse_args()
         name = args['name']
         bucketlist = Bucketlist.query.filter(Bucketlist.created_by == str(g.user.id), Bucketlist.id==id).first()
-        if bucketlist is None:
-            return {'error':
-                    'You cannot update bucketlist by that id and/ or it\'s not there'}, 404
-        bucketlist.name = name
-        bucketlist.date_modified = datetime.datetime.now(
-            ).replace(microsecond=0)
-        db.session.commit()
-        return {'message': "Bucketlist #{} Successfully updated".format(
-            bucketlist.id)}, 200
+        if name is not None:
+            if bucketlist is None:
+                return {'error':
+                        'You cannot update bucketlist by that id and/ or it\'s not there'}, 404
+            bucketlist.name = name
+            bucketlist.date_modified = datetime.datetime.now(
+                ).replace(microsecond=0)
+            db.session.commit()
+            return {'message': "Bucketlist #{} Successfully updated".format(
+                bucketlist.id)}, 200
+        return {'message': "Bucketlist #{} not updated, you did not enter a correct value".format(
+                bucketlist.id)}, 404
+
 
     @auth.login_required
     def delete(self, id):
@@ -228,12 +237,17 @@ class SingleBucketlistItem(Resource):
         args = self.parser.parse_args()
         title = args['title']
         done = args['done']
-        bucket_list_item.title = title
+        if title is not None:
+            bucket_list_item.title = title
+        if done is not None:
+            bucket_list_item.done = done
         bucket_list_item.date_modified = datetime.datetime.now().\
             replace(microsecond=0)
-        bucket_list_item.done = done
+        if title is None and done is None:
+            return {"message": "BucketlistItem {0} not updated".
+                format(bucket_list_item.id)}, 404
         db.session.commit()
-        return {"message": "BucketlistItem {0} Successfully updated".
+        return {"message": "BucketlistItem #{0} Successfully updated".
                 format(bucket_list_item.id)}, 200
 
     @auth.login_required
