@@ -2,6 +2,7 @@
 
 [![Build Status](https://semaphoreci.com/api/v1/stanmd/bucketlist/branches/feature-review/badge.svg)](https://semaphoreci.com/stanmd/bucketlist) [![Coverage Status](https://coveralls.io/repos/github/NdagiStanley/bucketlist/badge.svg?branch=feature-review)](https://coveralls.io/github/NdagiStanley/bucketlist?branch=feature-review) [![Code Issues](https://www.quantifiedcode.com/api/v1/project/413c57d2358940f097221a243f88d224/badge.svg)](https://www.quantifiedcode.com/app/project/413c57d2358940f097221a243f88d224) [![Code Climate](https://codeclimate.com/github/NdagiStanley/bucketlist/badges/gpa.svg)](https://codeclimate.com/github/NdagiStanley/bucketlist) [![Issue Count](https://codeclimate.com/github/NdagiStanley/bucketlist/badges/issue_count.svg)](https://codeclimate.com/github/NdagiStanley/bucketlist) [![Code Health](https://landscape.io/github/NdagiStanley/bucketlist/feature-review/landscape.svg?style=flat)](https://landscape.io/github/NdagiStanley/bucketlist/feature-review)
 
+![Checkpoint Status](https://img.shields.io/badge/Andela%20%20Stan_MD-CP%202%20complete-green.svg)
 
 BLiSA is a simple REST API allowing users to _**C**REATE_ bucketlists (things you want to do before you expire) and items in them. Then they are able to _**R**EAD_, _**U**PDATE_ and _**D**ELETE_ them.
 In short you are able to **CRUD** bucketlists
@@ -49,27 +50,16 @@ Implement the API in this structure:
 Implement Token Based Authentication
 
 | EndPoint      |   Public Access   |
-
-|::---- |:----: |
-
+| ---- |:----: |
 | POST /auth/login  |  TRUE     |
-
 | POST /auth/register   |  TRUE     |
-
 | POST /bucketlists/    |  FALSE    |
-
 | GET /bucketlists/     |  FALSE    |
-
 | GET /bucketlists/< id >   |   FALSE   |
-
 | PUT /bucketlists/< id >   |   FALSE   |
-
 | DELETE /bucketlists/< id >    |   FALSE   |
-
 | POST /bucketlists/< id >/items/   |   FALSE   |
-
 | PUT /bucketlists/< id >/items/< item_id >     |   FALSE   |
-
 | DELETE /bucketlists/< id >/items/< item_id >      |   FALSE   |
 
 The responses all belong to the logged in user
@@ -84,6 +74,16 @@ The limit is edittable via the url but set the **default as 20** and **maximum a
 
 - [http://localhost:5000/bucketlists?limit=20](http://localhost:5000/bucketlists?limit=20) (**GET**)
 
+Pagination is also implemented.
+
+The following will return the second page after limiting results to the default 20 per page
+
+- [http://localhost:5000/bucketlists?page=2](http://localhost:5000/bucketlists?page=2) (**GET**)
+
+Here is an example of pagination with custom limit. The results are 10 per page and we have requested the second page
+
+- [http://localhost:5000/bucketlists?limit=10&page=2](http://localhost:5000/bucketlists?limit=10&page=2) (**GET**)
+
 ##Task 3
 
 Implement Searching by name
@@ -91,8 +91,10 @@ Implement Searching by name
 Adding `?q=bucket1` to the bucketlists endpoint to specify characteristics of results returned.
 
 - [http://localhost:5000/bucketlists?q=bucket1](http://localhost:5000/bucketlists?q=bucket1) (**GET**)
+- [http://localhost:5000/bucketlists?q=bucket1](http://localhost:5000/bucketlists?q=bucket1) (**GET**)
 
 In this case expected results are Bucket lists with the string "**bucket1**" in their name
+`?q=b` will return Bucket lists with the string "**b**" in their name including those with the string "**b**", "**bu**", "**buc**", "**buck**" and so on.
 
 ##Running
 
