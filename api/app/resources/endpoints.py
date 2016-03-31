@@ -1,5 +1,4 @@
 import datetime
-import json
 
 from flask import g, request
 from flask.ext.httpauth import HTTPBasicAuth
@@ -96,7 +95,7 @@ class Bucketlists(Resource):
             for query in queries.all():
                 if qs in query.name:
                     bucketlists.append(query)
-            if len(bucketlists) == 0:
+            if not bucketlists:
                 return {'message': 'No search results'}, 404
             else:
                 return marshal([bucketlist for bucketlist in bucketlists], bucketlist_fields)

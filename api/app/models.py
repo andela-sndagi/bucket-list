@@ -1,4 +1,4 @@
-from flask import Flask, g
+from flask import Flask
 from flask.ext.sqlalchemy import SQLAlchemy
 
 from passlib.apps import custom_app_context as pwd_context

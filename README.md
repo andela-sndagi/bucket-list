@@ -2,7 +2,7 @@
 
 [![Build Status](https://semaphoreci.com/api/v1/stanmd/bucketlist/branches/feature-review/badge.svg)](https://semaphoreci.com/stanmd/bucketlist) [![Coverage Status](https://coveralls.io/repos/github/NdagiStanley/bucketlist/badge.svg?branch=feature-review)](https://coveralls.io/github/NdagiStanley/bucketlist?branch=feature-review) [![Code Issues](https://www.quantifiedcode.com/api/v1/project/413c57d2358940f097221a243f88d224/badge.svg)](https://www.quantifiedcode.com/app/project/413c57d2358940f097221a243f88d224) [![Code Climate](https://codeclimate.com/github/NdagiStanley/bucketlist/badges/gpa.svg)](https://codeclimate.com/github/NdagiStanley/bucketlist) [![Issue Count](https://codeclimate.com/github/NdagiStanley/bucketlist/badges/issue_count.svg)](https://codeclimate.com/github/NdagiStanley/bucketlist) [![Code Health](https://landscape.io/github/NdagiStanley/bucketlist/feature-review/landscape.svg?style=flat)](https://landscape.io/github/NdagiStanley/bucketlist/feature-review)
 
-![Checkpoint Status](https://img.shields.io/badge/Andela%20%20Stan_MD-CP%202%20complete-green.svg)
+![Checkpoint Status](https://img.shields.io/badge/Andela%20@Stan__MD-CP%202%20complete-green.svg)
 
 BLiSA is a simple REST API allowing users to _**C**REATE_ bucketlists (things you want to do before you expire) and items in them. Then they are able to _**R**EAD_, _**U**PDATE_ and _**D**ELETE_ them.
 In short you are able to **CRUD** bucketlists
@@ -98,9 +98,9 @@ In this case expected results are Bucket lists with the string "**bucket1**" in 
 
 ##Running
 
-RUN `python api.py start` to create the db and tables to be used
+RUN `python api/manage.py start` to create the db and tables to be used
 
-RUN `python api.py runserver` and go the pages at:
+RUN `python api/manage.py runserver` and go the pages at:
 
 - [http://localhost:5000/](http://localhost:5000/) index page (**GET**)
 
@@ -126,18 +126,17 @@ This returns a token in this format:
 }
 ```
 - [http://localhost:5000/bucketlists/](http://localhost:5000/bucketlists/) endpoints (**GET**, **POST**)
-Preferably use curl in this manner in the terminal:
 
-```
-curl -u eyJhbGciOiJIUzI1NiIsImV4cCI6MTQ1ODEwNjUwOCwiaWF0IjoxNDU4MTAyOTA4fQ.eyJpZCI6Nn0.Ekt_3nmlzJokR-exLg7uwiRrbUFPFB0LMAk2J_mJ0MI:unused -i -X GET http://127.0.0.1:5000/bucketlists/
-```
 The token will be used in all subsequent requests. Otherwise the requests will be unauthorised.
+
+In Postman enter the token in the header like this: (NB: The Content-Type is necessary in GET and PUT methods)
+
+
 
 In **POST** the body should be in this format:
 ```json
 {
-  "name": "Travel",
-  "created_by": "user1"
+  "name": "Travel"
 }
 ```
 - [http://localhost:5000/bucketlists/1](http://localhost:5000/bucketlists/1) endpoints (**GET**, **PUT**, **DELETE**)
@@ -160,7 +159,21 @@ In **PUT** the body should be in this format:
 }
 ```
 
-RUN `python api.py exit` to exit from the API
+or either:
+
+```json
+{
+  "title": "Travel to Mombasa"
+}
+```
+
+```json
+{
+  "done": true
+}
+```
+
+RUN `python api/manage.py exit` to exit from the API
 
 
 ##Testing
