@@ -21,6 +21,8 @@ class AppTestCase(unittest.TestCase, FixturesMixin):
     def setUp(self):
         """Setting up the environment for testing"""
         print "=> Setting up the environment for testing"
+        # Add configuration to the app
+        app.config.update({'TESTING': True})
         self.app = app.test_client()
         initialise()
 
@@ -42,7 +44,7 @@ class AppTestCase(unittest.TestCase, FixturesMixin):
         self.assertEqual(len(users) == User.query.count(), 1)
 
     def test_bucketlists_in_fixtures(self):
-        """Test bucketlist entries in fixtures"""
+        """Test bucket-list entries in fixtures"""
         bucketlists = Bucketlist.query.all()
         self.assertEqual(len(bucketlists) == Bucketlist.query.count(), 1)
         u1 = User.query.filter(User.username == 'User1').first()
@@ -50,9 +52,9 @@ class AppTestCase(unittest.TestCase, FixturesMixin):
             assert bucketlist.created_by == u1.id
 
     def test_bucketlist_items_in_fixtures(self):
-        """Test bucketlistitems entries in fixtures"""
+        """Test bucket-list items entries in fixtures"""
         items = BucketlistItem.query.all()
         self.assertEqual(len(items) == Bucketlist.query.count(), 1)
         bl1 = Bucketlist.query.filter(Bucketlist.name == 'BucketList1').first()
         for item in items:
-            assert item.bucketlist_id == bl1
+            assert item.bucketlist == 1

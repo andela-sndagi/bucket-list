@@ -6,12 +6,15 @@ from itsdangerous import (TimedJSONWebSignatureSerializer
                           as Serializer, BadSignature, SignatureExpired)
 from flask.ext.httpauth import HTTPBasicAuth
 
+# declare auth to be used for authentication
 auth = HTTPBasicAuth()
 
-# Initialise Flask
+# Initialize Flask
 app = Flask(__name__)
 
+# Initialize the database
 db = SQLAlchemy(app)
+
 
 class User(db.Model):
     """User model"""
@@ -24,14 +27,20 @@ class User(db.Model):
         return pwd_context.encrypt(password)
 
     def verify_password(self, password):
+        """Verifies the password entered against the hashed one in the db
+           Returns true if the password entered is correct"""
         return pwd_context.verify(password, self.password)
 
-    def generate_auth_token(self, expiration = 3600):
-        s = Serializer(app.config['SECRET_KEY'], expires_in = expiration)
+    def generate_auth_token(self, expiration=3600):
+        """Generates the token for authentication and inserts the user id in it to
+           uniquely identify the user by decoding the token itself"""
+        s = Serializer(app.config['SECRET_KEY'], expires_in=expiration)
         return s.dumps({'id': self.id})
 
     @staticmethod
     def verify_auth_token(token):
+        """Verify the token entered in the header then returns the user
+           associated with the token"""
         s = Serializer(app.config['SECRET_KEY'])
         if token is None:
             return {}
@@ -62,10 +71,8 @@ class Bucketlist(db.Model):
     date_modified = db.Column(db.DateTime,
                               default=db.func.current_timestamp())
     created_by = db.Column(db.Integer, db.ForeignKey('user.id'))
-    user_id = db.relationship('User', backref='bucketlist')
 
-
-    #  Constructor for Bucketlist
+    #  Constructor for Bucket-list
     def __init__(self, name, created_by):
         self.name = name
         self.created_by = created_by
@@ -79,7 +86,6 @@ class BucketlistItem(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(80))
     bucketlist = db.Column(db.Integer, db.ForeignKey('bucketlist.id'))
-    bucketlist_id = db.relationship('Bucketlist', backref='items')
     date_created = db.Column(db.DateTime,
                              default=db.func.current_timestamp())
     date_modified = db.Column(db.DateTime,

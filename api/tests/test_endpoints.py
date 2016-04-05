@@ -23,6 +23,7 @@ class AppTestCase(unittest.TestCase, FixturesMixin):
     def setUp(self):
         """Setting up the environment for testing"""
         print "=> Setting up the environment for testing"
+        # Add configuration to the app
         app.config.update({'TESTING': True, 'SECRET_KEY': "abcdefgh"})
         self.app = app.test_client()
         initialise()
@@ -125,7 +126,6 @@ class AppTestCase(unittest.TestCase, FixturesMixin):
                                  headers={'token': self.get_token(),
                                           'Content-Type': 'application/json'})
         self.assertEqual(response.status_code, 201)
-
 
     def test_put_specific_bucketlistitem_route(self):
         """Test that PUT in /bucketlists/<>/items/<> route is working"""

@@ -32,9 +32,9 @@ class Register(Resource):
         if username is None or password is None or conf_password is None:
             return {'message':
                     'Please enter username and/'
-                    '' + 'or password and/ or conf_password'}, 404
+                    '' + 'or password and/ or conf_password'}, 400
         if User.query.filter_by(username=username).first() is not None:
-            return {'message': 'There is a user with that username'}, 404
+            return {'message': 'There is a user with that username'}, 400
         if password == conf_password:
             new_user = User(username=username, password=password)
             username = new_user.username
@@ -42,7 +42,7 @@ class Register(Resource):
             db.session.commit()
             return {'message':
                     "User '{}' successfully registered".format(username)}, 201
-        return {'message': 'Passwords don\'t match'}, 404
+        return {'message': 'Passwords don\'t match'}, 400
 
 class Login(Resource):
     """
@@ -68,8 +68,8 @@ class Login(Resource):
 
         user = User.query.filter_by(username=username).first()
         if user is None:
-            return {'message': 'There\'s no user by that username'}, 404
+            return {'message': 'There\'s no user by that username'}, 400
         if user.verify_password(password):
             token = user.generate_auth_token()
             return jsonify({'token': token.decode('ascii')})
-        return {'message': 'Wrong password. Please try again'}, 404
+        return {'message': 'Wrong password. Please try again'}, 400

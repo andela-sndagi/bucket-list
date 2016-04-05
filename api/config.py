@@ -1,6 +1,3 @@
-# bucketlist/config.py
-
-
 class Config(object):
     """Default Settings"""
     DEBUG = False
@@ -9,6 +6,6 @@ class Config(object):
 
 
 class DevelopmentConfig(Config):
-    """setting Development configuration"""
+    """Development configuration settings"""
     SQLALCHEMY_DATABASE_URI = 'sqlite:///bucketlists.db'
     DEBUG = True
