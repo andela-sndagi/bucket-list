@@ -164,15 +164,16 @@ class SingleBucketlist(Resource):
         if name is not None:
             if bucketlist is None:
                 return {'error':
-                        'You cannot update bucketlist by that id and/ or it\'s not there'}, 404
+                        'You cannot update bucketlist by \
+                            that id and/ or it\'s not there'}, 404
             bucketlist.name = name
             bucketlist.date_modified = datetime.datetime.now(
                 ).replace(microsecond=0)
             db.session.commit()
             return {'message': "Bucketlist #{} Successfully updated".format(
                 bucketlist.id)}, 200
-        return {'message': "Bucketlist #{} not updated, you did not enter a correct value".format(
-                bucketlist.id)}, 404
+        return {'message': "Bucketlist #{} not updated, you did not enter \
+            a correct value".format(bucketlist.id)}, 404
 
     @auth.login_required
     def delete(self, id):
@@ -182,7 +183,8 @@ class SingleBucketlist(Resource):
                                              Bucketlist.id == id).first()
         if bucketlist is None:
             return {'error':
-                    'You cannot delete bucketlist by that id and/ or it\'s not there'}, 404
+                    'You cannot delete bucketlist by that \
+                        id and/ or it\'s not there'}, 404
         db.session.delete(bucketlist)
         db.session.commit()
         # print to console
@@ -272,9 +274,9 @@ class SingleBucketlistItem(Resource):
     def delete(self, id, item_id):
         """DELETE endpoint"""
 
-        bucketlist = Bucketlist.query.filter(Bucketlist.created_by ==
-                                             str(g.user.id),
-                                             Bucketlist.id == id).first()
+        bucketlist = Bucketlist.query.filter(
+            Bucketlist.created_by == str(g.user.id),
+            Bucketlist.id == id).first()
         if bucketlist is None:
             return {'error': 'Not permitted'}, 404
 

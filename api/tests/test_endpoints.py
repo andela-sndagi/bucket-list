@@ -36,7 +36,8 @@ class AppTestCase(unittest.TestCase, FixturesMixin):
     def get_token(self):
         """Login to return token for authentication"""
         data = json.dumps({'username': 'User1', 'password': 'p@ssw0rd'})
-        response = self.app.post('/auth/login/', data=data, content_type='application/json')
+        response = self.app.post('/auth/login/', data=data,
+            content_type='application/json')
         token = json.loads(response.data).get('token')
         return token
 
@@ -48,7 +49,8 @@ class AppTestCase(unittest.TestCase, FixturesMixin):
         self.assertEqual(response.status_code, 401)
 
         # Test route with token
-        response = self.app.get('/bucketlists/', headers={'token': self.get_token()})
+        response = self.app.get('/bucketlists/', headers={'token':
+            self.get_token()})
         self.assertEqual(response.status_code, 200)
         bucketlists = json.loads(response.data).get('bucketlists')
         self.assertEqual(len(bucketlists), 1)
@@ -98,7 +100,8 @@ class AppTestCase(unittest.TestCase, FixturesMixin):
                                  headers={'token': self.get_token(),
                                           'Content-Type': 'application/json'})
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(json.loads(response.data)['message'], "Bucketlist #1 Successfully updated")
+        self.assertEqual(json.loads(response.data)['message'],
+            "Bucketlist #1 Successfully updated")
 
     def test_delete_specific_bucketlist_route(self):
         """Test that POST in /bucketlists/<> route is working"""
@@ -142,7 +145,8 @@ class AppTestCase(unittest.TestCase, FixturesMixin):
                                  headers={'token': self.get_token(),
                                           'Content-Type': 'application/json'})
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(json.loads(response.data)['message'], "BucketlistItem #1 Successfully updated")
+        self.assertEqual(json.loads(response.data)['message'],
+            "BucketlistItem #1 Successfully updated")
 
     def test_delete_specific_bucketlistitem_route(self):
         """Test that DELETE in /bucketlists/<>/items/<> route is working"""

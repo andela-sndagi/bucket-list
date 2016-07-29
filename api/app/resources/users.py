@@ -59,7 +59,6 @@ class Login(Resource):
                                  location='json')
         super(Login, self).__init__()
 
-    # @auth.login_required
     def post(self):
         """POST endpoint that requires that you enter username and password"""
         args = self.parser.parse_args()

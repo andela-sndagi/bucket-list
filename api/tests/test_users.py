@@ -30,7 +30,8 @@ class AppTestCase(unittest.TestCase):
             'username': 'user',
             'password': 'p@ssw0rd'
         })
-        response = self.app.post('/auth/register/', data=data, content_type='application/json')
+        response = self.app.post('/auth/register/', data=data,
+            content_type='application/json')
         self.assertEqual(response.status_code, 400)
 
         # Testing that 'conf_password' is incorrect
@@ -39,7 +40,8 @@ class AppTestCase(unittest.TestCase):
             'password': 'p@ssw0rd',
             'conf_password': 'password'
         })
-        response = self.app.post('/auth/register/', data=data, content_type='application/json')
+        response = self.app.post('/auth/register/', data=data,
+            content_type='application/json')
         self.assertEqual(response.status_code, 400)
 
         # Correct entry
@@ -48,7 +50,8 @@ class AppTestCase(unittest.TestCase):
             'password': 'p@ssw0rd',
             'conf_password': 'p@ssw0rd'
         })
-        response = self.app.post('/auth/register/', data=data, content_type='application/json')
+        response = self.app.post('/auth/register/', data=data,
+            content_type='application/json')
         self.assertEqual(response.status_code, 201)
         self.assertNotEqual(User.query.all(), None)
         self.assertEqual(len(User.query.all()), 1)
@@ -59,7 +62,8 @@ class AppTestCase(unittest.TestCase):
             'password': 'p@ssw0rd',
             'conf_password': 'p@ssw0rd'
         })
-        response = self.app.post('/auth/register/', data=data, content_type='application/json')
+        response = self.app.post('/auth/register/', data=data,
+            content_type='application/json')
         self.assertEqual(response.status_code, 400)
 
     def test_post_login_route(self):
@@ -70,7 +74,8 @@ class AppTestCase(unittest.TestCase):
             'username': 'user',
             'password': 'p@ssw0rd'
         })
-        response = self.app.post('/auth/login/', data=data, content_type='application/json')
+        response = self.app.post('/auth/login/', data=data,
+            content_type='application/json')
         self.assertEqual(response.status_code, 400)
 
         # Create user
@@ -83,7 +88,8 @@ class AppTestCase(unittest.TestCase):
             'username': 'username',
             'password': 'password'
         })
-        response = self.app.post('/auth/login/', data=data, content_type='application/json')
+        response = self.app.post('/auth/login/', data=data,
+            content_type='application/json')
         self.assertEqual(response.status_code, 400)
 
         # Correct entry
@@ -91,6 +97,7 @@ class AppTestCase(unittest.TestCase):
             'username': 'username',
             'password': 'p@ssw0rd'
         })
-        response = self.app.post('/auth/login/', data=data, content_type='application/json')
+        response = self.app.post('/auth/login/', data=data,
+            content_type='application/json')
         self.assertEqual(response.status_code, 200)
         self.assertIn('token', response.data)

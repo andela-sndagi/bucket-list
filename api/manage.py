@@ -12,7 +12,12 @@ manager = Manager(app)
 @manager.command
 def start():
     """Start Application by creating Database and tables within."""
-    print "Bucket-list API is initializing... \n(If it is your first RUN you will have demo data according to the TASK segment in the README)\n  (If you want to do away with previous data and start)\n     RUN 'python api/manage.py exit' after-which you\n     RUN 'python api/manage.py start' \n  Otherwise proceed to run the app 'python api/manage.py runserver'"
+    print "Bucket-list API is initializing... \n(If it is your first \
+    RUN you will have demo data according to the TASK segment in the README)\n \
+    (If you want to do away with previous data and start)\n \
+    RUN 'python api/manage.py exit' after-which you\n \
+    RUN 'python api/manage.py start' \n \
+    Otherwise proceed to run the app 'python api/manage.py runserver'"
     initialise()
 
 @manager.command

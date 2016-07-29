@@ -32,15 +32,19 @@ class User(db.Model):
         return pwd_context.verify(password, self.password)
 
     def generate_auth_token(self, expiration=3600):
-        """Generates the token for authentication and inserts the user id in it to
-           uniquely identify the user by decoding the token itself"""
+        """
+        Generates the token for authentication and inserts the user id in it to
+        uniquely identify the user by decoding the token itself
+        """
         s = Serializer(app.config['SECRET_KEY'], expires_in=expiration)
         return s.dumps({'id': self.id})
 
     @staticmethod
     def verify_auth_token(token):
-        """Verify the token entered in the header then returns the user
-           associated with the token"""
+        """
+        Verify the token entered in the header then returns the user
+        associated with the token
+        """
         s = Serializer(app.config['SECRET_KEY'])
         if token is None:
             return {}

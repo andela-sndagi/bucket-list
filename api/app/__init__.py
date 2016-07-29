@@ -4,7 +4,8 @@ from models import app
 # Resources
 from resources import Index
 from resources.users import Login, Register
-from resources.endpoints import Bucketlists, BucketlistItems, SingleBucketlist, SingleBucketlistItem
+from resources.endpoints import Bucketlists, BucketlistItems
+from resources.endpoints import SingleBucketlist, SingleBucketlistItem
 
 # Instance of Api
 api = Api(app)
