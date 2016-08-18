@@ -4,15 +4,16 @@
 
 ![Checkpoint Status](https://img.shields.io/badge/Andela%20@Stan__MD-CP%202%20complete-green.svg)
 
+> Be able to **CRUD** bucketlists
+
 BLiSA is a simple REST API allowing users to _**C**REATE_ bucketlists (things you want to do before you expire) and items in them. Then they are able to _**R**EAD_, _**U**PDATE_ and _**D**ELETE_ them.
-In short you are able to **CRUD** bucketlists
 
 It's implementing:
 
 ![Flask, python, mysql](http://codehandbook.org/wp-content/uploads/2015/07/python_ff.jpg)
 (Image courtesy- codehandbook.org)
 
-##Installation
+## Installation
 **We'll use the terminal here**
 
 1. Clone the repo
@@ -22,7 +23,7 @@ run: ```git clone https://github.com/NdagiStanley/bucketlist.git```
 3. In the virtual environment install DEPENDENCIES
 RUN ```pip install -r requirements.txt```
 
-##Task 0
+## Task 0
 
 Implement the API in this structure:
 
@@ -45,7 +46,7 @@ Implement the API in this structure:
 }
 ```
 
-##Task 1
+## Task 1
 
 Implement Token Based Authentication
 
@@ -64,7 +65,7 @@ Implement Token Based Authentication
 
 The responses all belong to the logged in user
 
-##Task 2
+## Task 2
 
 Implement Pagination on the API
 
@@ -84,7 +85,7 @@ Here is an example of pagination with custom limit. The results are 10 per page 
 
 - [http://localhost:5000/bucketlists?limit=10&page=2](http://localhost:5000/bucketlists?limit=10&page=2) (**GET**)
 
-##Task 3
+## Task 3
 
 Implement Searching by name
 
@@ -96,7 +97,7 @@ Adding `?q=bucket1` to the bucketlists endpoint to specify characteristics of re
 In this case expected results are Bucket lists with the string "**bucket1**" in their name
 `?q=b` will return Bucket lists with the string "**b**" in their name including those with the string "**b**", "**bu**", "**buc**", "**buck**" and so on.
 
-##Running
+## Running
 
 RUN `python api/manage.py start` to create the db and tables to be used
 
@@ -176,7 +177,7 @@ or either:
 RUN `python api/manage.py exit` to exit from the API
 
 
-##Testing
+## Testing
 
 RUN `nosetests`
 
