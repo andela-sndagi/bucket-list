@@ -1,0 +1,23 @@
+[
+    {
+        "model": "api.app.models.User",
+        "records": [{
+            "username": "User1",
+            "password": "p@ssw0rd"
+        }]
+    },
+    {
+        "model": "api.app.models.Bucketlist",
+        "records": [{
+            "name": "BucketList1",
+            "created_by": 1
+        }]
+    },
+    {
+        "model": "api.app.models.BucketlistItem",
+        "records": [{
+            "title": "I need to do X",
+            "bucketlist": 1
+        }]
+    }
+]
